@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EsotericRogue", "EsotericRogue\EsotericRogue.csproj", "{AF2F390D-751F-43A7-B56C-2FC98F6EE00D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DungeonRogue", "DungeonRogue\DungeonRogue.csproj", "{DF8B6B53-9BC2-4B3A-8B59-C2FED60ABDB4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF2F390D-751F-43A7-B56C-2FC98F6EE00D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF2F390D-751F-43A7-B56C-2FC98F6EE00D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF2F390D-751F-43A7-B56C-2FC98F6EE00D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF2F390D-751F-43A7-B56C-2FC98F6EE00D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF8B6B53-9BC2-4B3A-8B59-C2FED60ABDB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF8B6B53-9BC2-4B3A-8B59-C2FED60ABDB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF8B6B53-9BC2-4B3A-8B59-C2FED60ABDB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF8B6B53-9BC2-4B3A-8B59-C2FED60ABDB4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F0DF4C25-D29B-4DAE-A6CC-CF852977A48D}
+	EndGlobalSection
+EndGlobal
