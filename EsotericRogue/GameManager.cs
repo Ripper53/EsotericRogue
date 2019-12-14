@@ -10,26 +10,34 @@ namespace EsotericRogue {
         private readonly BattleMenu battleMenu;
 
         public GameManager(Unit playerUnit) {
-            Scene = new Scene();
-            PlayerInfo = new PlayerInfo(this, playerUnit);
             uis = new List<UI>();
             selectableUIs = new List<SelectableUI>();
-            battleMenu = new BattleMenu(this, playerUnit.Character);
+            Scene = new Scene();
+            PlayerInfo = new PlayerInfo(this, playerUnit);
+            battleMenu = new BattleMenu(this, PlayerInfo);
         }
 
-        public void AddUI(UI ui) {
+        public bool AddUI(UI ui) {
+            if (ui.Active)
+                return false;
+            ui.Active = true;
             uis.Add(ui);
             if (ui is SelectableUI selectableUI)
                 selectableUIs.Add(selectableUI);
+            return true;
         }
 
-        public void RemoveUI(UI ui) {
+        public bool RemoveUI(UI ui) {
+            if (!ui.Active)
+                return false;
+            ui.Active = false;
             uis.Remove(ui);
             if (ui is SelectableUI selectableUI) {
                 selectableUIs.Remove(selectableUI);
                 if (PlayerInfo.Input.SelectedUI == selectableUI)
                     PlayerInfo.Input.SelectedUI = GetFirstSelectableUI();
             }
+            return true;
         }
 
         public SelectableUI GetFirstSelectableUI() {
@@ -38,7 +46,10 @@ namespace EsotericRogue {
             return null;
         }
 
-        protected abstract void Start();
+        /// <summary>
+        /// Return true to start game, otherwise false to quit.
+        /// </summary>
+        protected abstract bool Start();
 
         private void Generate() {
             SceneGenerator.Generate();
@@ -48,8 +59,9 @@ namespace EsotericRogue {
 
         public void Display() {
             Scene.Display();
-            PlayerInfo.InfoUI.Display();
-
+            DisplayUI();
+        }
+        public void DisplayUI() {
             foreach (UI ui in uis) {
                 ui.Display();
             }
@@ -62,7 +74,8 @@ namespace EsotericRogue {
         }
 
         public void Run() {
-            Start();
+            Renderer.Clear();
+            if (!Start()) return;
 
             Generate();
             while (true) {
@@ -91,8 +104,7 @@ namespace EsotericRogue {
                                 }
                                 // If any enemies were met, battle them.
                                 while (toBattle.Count > 0) {
-                                    battleMenu.Battle(toBattle.Dequeue());
-                                    if (brain.Unit.Character.Health <= 0) {
+                                    if (!battleMenu.Battle(toBattle.Dequeue())) {
                                         // Death! Game Over!
                                         return;
                                     }

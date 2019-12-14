@@ -4,13 +4,16 @@ using System.Collections.Generic;
 namespace EsotericRogue {
     public class BattleMenu : Menu {
         public readonly GameManager GameManager;
+        public readonly PlayerInfo PlayerInfo;
         public readonly Character PlayerCharacter;
 
-        private bool enemyTurn = false;
-        public BattleMenu(GameManager gameManager, Character playerCharacter) {
+        private bool playerAlive = true, enemyTurn = false;
+        public BattleMenu(GameManager gameManager, PlayerInfo playerInfo) {
             GameManager = gameManager;
-            PlayerCharacter = playerCharacter;
-            Position = new Vector2(0, 5);
+            PlayerInfo = playerInfo;
+            PlayerCharacter = PlayerInfo.Character;
+            PlayerCharacter.Died += source => playerAlive = false;
+            Position = new Vector2(0, 6);
             Options = new List<Option>(2) {
                 new Option() {
                     Sprites = new Sprite[] {
@@ -18,12 +21,18 @@ namespace EsotericRogue {
                     },
                     Action = (menu, op) => {
                         enemyTurn = true;
+                        PlayerInfo.CharacterBrain.Description = new Sprite[] {
+                            CreateSprite("Skip.")
+                        };
                     }
                 }
             };
         }
 
-        public void Battle(Character character) {
+        /// <summary>
+        /// Returns true if battle was won, otherwise false.
+        /// </summary>
+        public bool Battle(Character character) {
             // Prep
             GameManager.AddUI(this);
 
@@ -35,62 +44,89 @@ namespace EsotericRogue {
             };
             GameManager.AddUI(vsText);
 
-            TextUI descriptionText = new TextUI() {
-                Position = new Vector2(40, 0)
+            const int playerDescriptionPosX = 64, enemyDescriptionPosX = 40;
+            TextUI playerNameDescriptionText = new TextUI() {
+                Sprites = new Sprite[] {
+                    new Sprite(PlayerCharacter.Name + " Actions:")
+                },
+                Position = new Vector2(playerDescriptionPosX, 0)
             };
-            GameManager.AddUI(descriptionText);
+            GameManager.AddUI(playerNameDescriptionText);
+
+            TextUI enemyNameDescriptionText = new TextUI() {
+                Sprites = new Sprite[] {
+                    new Sprite(character.Name + " Actions:")
+                },
+                Position = new Vector2(enemyDescriptionPosX, 0)
+            };
+            GameManager.AddUI(enemyNameDescriptionText);
+
+            TextUI playerDescriptionText = new TextUI() {
+                Position = new Vector2(playerDescriptionPosX, 1),
+                Width = 20
+            };
+            GameManager.AddUI(playerDescriptionText);
+
+            TextUI enemyDescriptionText = new TextUI() {
+                Position = new Vector2(enemyDescriptionPosX, 1),
+                Width = 20
+            };
+            GameManager.AddUI(enemyDescriptionText);
+
 
             InfoUI enemyInfo = new InfoUI(character) {
                 Position = new Vector2(21, 0)
             };
             GameManager.AddUI(enemyInfo);
 
-            Vector2 previousPos = GameManager.PlayerInfo.InfoUI.Position;
+            Vector2 previousInfoUIPos = GameManager.PlayerInfo.InfoUI.Position;
             GameManager.PlayerInfo.InfoUI.Position = new Vector2(0, 0);
-
-            void CleanUp() {
-                GameManager.RemoveUI(this);
-                GameManager.PlayerInfo.InfoUI.Position = previousPos;
-                enemyInfo.Destroy();
-                GameManager.RemoveUI(enemyInfo);
-                GameManager.RemoveUI(vsText);
-                GameManager.RemoveUI(descriptionText);
-            }
+            Vector2 previousInventoryMenuPos = GameManager.PlayerInfo.InventoryMenu.Position;
+            GameManager.PlayerInfo.InventoryMenu.Position = new Vector2(84, 0);
 
             // Battle
             GameManager.Display();
-            while (character.Health > 0) {
-                if (PlayerCharacter.Health <= 0) {
-                    CleanUp();
+            bool enemyAlive = true;
+            character.Died += source => enemyAlive = false;
+            while (enemyAlive) {
+                if (!playerAlive) {
+                    GameManager.RemoveUI(this);
                     Renderer.Clear();
-                    GameManager.PlayerInfo.InfoUI.Position = new Vector2(0, 0);
-                    GameManager.PlayerInfo.InfoUI.Display();
-                    enemyInfo.Display();
-                    descriptionText.Display();
+                    GameManager.DisplayUI();
                     Renderer.Display(
                         CreateSprite("Game Over!" + Environment.NewLine),
                         new Vector2(0, 7)
                     );
                     Renderer.ReadLine();
-                    return;
+                    return false;
                 }
-
-                if (GameManager.PlayerInfo.Input.SelectedUI == null)
-                    GameManager.PlayerInfo.Input.SelectedUI = this;
-                GameManager.PlayerInfo.Input.UIControls();
-                if (enemyTurn) {
+                if (PlayerInfo.Input.SelectedUI == null)
+                    PlayerInfo.Input.SelectedUI = this;
+                PlayerCharacter.Brain.Controls(character);
+                if (enemyAlive && enemyTurn) {
                     enemyTurn = false;
                     character.Brain.Controls(PlayerCharacter);
-                    descriptionText.Sprites = character.Brain.GetDescription();
-                    descriptionText.Display();
+                    enemyDescriptionText.Sprites = character.Brain.GetDescription();
+                    enemyDescriptionText.Display();
+                    playerDescriptionText.Sprites = PlayerCharacter.Brain.GetDescription();
+                    playerDescriptionText.Display();
                 }
             }
 
             // Drop
-
+            PlayerCharacter.Inventory.Gold += character.Inventory.Gold;
 
             // Clean up
-            CleanUp();
+            GameManager.RemoveUI(this);
+            GameManager.PlayerInfo.InfoUI.Position = previousInfoUIPos;
+            GameManager.PlayerInfo.InventoryMenu.Position = previousInventoryMenuPos;
+            GameManager.RemoveUI(enemyInfo);
+            GameManager.RemoveUI(vsText);
+            GameManager.RemoveUI(playerNameDescriptionText);
+            GameManager.RemoveUI(enemyNameDescriptionText);
+            GameManager.RemoveUI(playerDescriptionText);
+            GameManager.RemoveUI(enemyDescriptionText);
+            return true;
         }
     }
 }

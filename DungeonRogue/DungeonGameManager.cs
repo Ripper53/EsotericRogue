@@ -3,6 +3,8 @@ using EsotericRogue;
 
 namespace DungeonRogue {
     public class DungeonGameManager : GameManager {
+        public bool QuitGame { get; private set; }
+
         public DungeonGameManager() : base(
             new Unit(new Character(10, new PlayerCharacterBrain(), new BareWeapon()), new PlayerUnitBrain()) {
                 Sprite = new Sprite("@", ConsoleColor.Magenta)
@@ -11,18 +13,24 @@ namespace DungeonRogue {
         
         }
 
-        protected override void Start() {
+        protected override bool Start() {
             bool startGame = false;
             Menu menu = new Menu() {
                 Sprites = new Sprite[] {
-                    new Sprite("Dungeon Rogue\n")
+                    new Sprite("Dungeon Rogue" + Environment.NewLine)
                 },
                 Options = new Menu.Option[] {
                     new Menu.Option() {
                         Sprites = new Sprite[] {
-                            new Sprite("Start", ConsoleColor.White, ConsoleColor.Black)
+                            UI.CreateSprite("Start")
                         },
                         Action = (menu, op) => startGame = true
+                    },
+                    new Menu.Option() {
+                        Sprites = new Sprite[] {
+                            UI.CreateSprite("Quit")
+                        },
+                        Action = (menu, op) => QuitGame = true
                     }
                 },
                 Position = new Vector2(0, 0)
@@ -31,6 +39,8 @@ namespace DungeonRogue {
             menu.Display();
             do {
                 PlayerInfo.Input.SelectedUI = menu;
+                if (QuitGame)
+                    return false;
             } while (!PlayerInfo.Input.UIControls() || !startGame);
             PlayerInfo.Input.SelectedUI = null;
 
@@ -39,7 +49,8 @@ namespace DungeonRogue {
             string name = Renderer.ReadLine();
             if (name == "")
                 name = "You";
-            PlayerInfo.Input.PlayerUnitBrain.Unit.Character.Name = name;
+            PlayerInfo.Character.Name = name;
+            return true;
         }
     }
 }

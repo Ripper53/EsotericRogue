@@ -13,24 +13,33 @@ namespace EsotericRogue {
             NameSprite = new Sprite(character.Name);
             Character = character;
             OffsetY = 1;
-            Init();
+            Activated += source => {
+                Character.HealthChanged += Character_HealthChanged;
+                Character.Stamina.ValueChanged += Stamina_ValueChanged;
+                Character.Mana.ValueChanged += Mana_ValueChanged;
+                Character.Energy.ValueChanged += Energy_ValueChanged;
+            };
+            Deactivated += source => {
+                Character.HealthChanged -= Character_HealthChanged;
+                Character.Stamina.ValueChanged -= Stamina_ValueChanged;
+                Character.Mana.ValueChanged -= Mana_ValueChanged;
+                Character.Energy.ValueChanged -= Energy_ValueChanged;
+            };
         }
-
-        private void SetName() {
-            int newLineLength = Environment.NewLine.Length;
-            StringBuilder stringBuilder = new StringBuilder(Character.Name, Character.Name.Length + newLineLength);
-            const int maxLength = 17;
-            if (stringBuilder.Length > maxLength) {
-                string n = stringBuilder.ToString(0, maxLength - 1);
-                stringBuilder.Clear();
-                stringBuilder.Append(n);
-                stringBuilder.Append(ContinuedString);
-            }
-            for (int i = 0, count = maxLength - stringBuilder.Length; i < count; i++)
-                stringBuilder.Append(' ');
-            stringBuilder.Append(Environment.NewLine);
-            NameSprite.Display = stringBuilder.ToString();
+        #region Events
+        private void Character_HealthChanged(Character character, int oldHealth) {
+            Renderer.Display(GetSprite(character.Health, character.MaxHealth), Position + new Vector2(8, OffsetY));
         }
+        private void Stamina_ValueChanged(Resource resource, int oldValue) {
+            Renderer.Display(GetSprite(resource), Position + new Vector2(8, OffsetY + 1));
+        }
+        private void Mana_ValueChanged(Resource resource, int oldValue) {
+            Renderer.Display(GetSprite(resource), Position + new Vector2(8, OffsetY + 2));
+        }
+        private void Energy_ValueChanged(Resource resource, int oldValue) {
+            Renderer.Display(GetSprite(resource), Position + new Vector2(8, OffsetY + 3));
+        }
+        #endregion
 
         private static Sprite GetSprite(Resource resource) {
             return GetSprite(resource.Value, resource.Max);
@@ -49,37 +58,9 @@ namespace EsotericRogue {
             return new Sprite(stringBuilder.ToString(), ConsoleColor.White, ConsoleColor.Black);
         }
 
-        public void Init() {
-            Character.HealthChanged += Character_HealthChanged;
-            Character.Stamina.ValueChanged += Stamina_ValueChanged;
-            Character.Mana.ValueChanged += Mana_ValueChanged;
-            Character.Energy.ValueChanged += Energy_ValueChanged;
-        }
-
-        public void Destroy() {
-            Character.HealthChanged -= Character_HealthChanged;
-            Character.Stamina.ValueChanged -= Stamina_ValueChanged;
-            Character.Mana.ValueChanged -= Mana_ValueChanged;
-            Character.Energy.ValueChanged -= Energy_ValueChanged;
-        }
-
-        #region Events
-        private void Character_HealthChanged(Character character, int oldHealth) {
-            Renderer.Display(GetSprite(character.Health, character.MaxHealth), Position + new Vector2(8, OffsetY));
-        }
-        private void Stamina_ValueChanged(Resource resource, int oldValue) {
-            Renderer.Display(GetSprite(resource), Position + new Vector2(8, OffsetY + 1));
-        }
-        private void Mana_ValueChanged(Resource resource, int oldValue) {
-            Renderer.Display(GetSprite(resource), Position + new Vector2(8, OffsetY + 2));
-        }
-        private void Energy_ValueChanged(Resource resource, int oldValue) {
-            Renderer.Display(GetSprite(resource), Position + new Vector2(8, OffsetY + 3));
-        }
-        #endregion
-
         protected override void DisplayUI() {
-            SetName();
+            const int maxLength = 17;
+            NameSprite.Display = GetStringFill(GetStringMax(Character.Name, maxLength), maxLength) + Environment.NewLine;
             Renderer.Add(NameSprite);
             if (Sprites != null) {
                 foreach (Sprite sprite in Sprites)

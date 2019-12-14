@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace EsotericRogue {
     public static class Renderer {
         private static readonly List<Sprite> sprites = new List<Sprite>();
         private static Sprite GetLatest() {
             if (sprites.Count > 0)
-                return sprites[sprites.Count - 1];
+                return sprites[^1];
             return null;
         }
 
@@ -53,15 +52,27 @@ namespace EsotericRogue {
         }
 
         public static void Display(Vector2 position) {
-            for (int i = 0, countI = sprites.Count, linePadY = 0; i < countI; i++) {
-                Sprite sprite = sprites[i];
+            int startX = position.x;
+            Console.SetCursorPosition(position.x, position.y);
+            foreach (Sprite sprite in sprites) {
                 SetUp(sprite);
                 string[] lines = sprite.Display.Split(Environment.NewLine);
-                Console.SetCursorPosition(position.x, position.y + linePadY);
-                Console.Write(lines[0]);
-                for (int j = 1, countJ = lines.Length; j < countJ; j++, linePadY++) {
-                    Console.SetCursorPosition(position.x, position.y + linePadY);
-                    Console.Write(lines[j]);
+                if (lines.Length > 1) {
+                    // If there is more than 1 line, then we need to make sure the last line does not create a new line!
+                    int count = lines.Length - 1;
+                    for (int i = 0; i < count; i++) {
+                        Console.CursorLeft = position.x;
+                        Console.WriteLine(lines[i]);
+                    }
+                    Console.CursorLeft = position.x;
+                    position.x = startX;
+                    Console.Write(lines[count]);
+                } else {
+                    foreach (string line in lines) {
+                        Console.CursorLeft = position.x;
+                        position.x += line.Length;
+                        Console.Write(line);
+                    }
                 }
             }
             sprites.Clear();

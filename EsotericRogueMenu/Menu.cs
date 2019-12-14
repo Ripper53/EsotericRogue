@@ -7,13 +7,12 @@ namespace EsotericRogue {
         public IList<Option> Options;
         public int SelectedOptionIndex { get; private set; }
 
-        protected override void OnSelected() {
-            WriteSelected();
+        public Menu() {
+            OnSelected += OnSelected_Event;
+            OnDeselected += OnDeselected_Event;
         }
-
-        protected override void OnDeselected() {
-            WriteUnselected(SelectedOptionIndex);
-        }
+        private void OnSelected_Event(SelectableUI source) => WriteSelected();
+        private void OnDeselected_Event(SelectableUI source) => WriteUnselected(SelectedOptionIndex);
 
         public Option GetSelectedOption() {
             if (Options != null && Options.Count > 0)
@@ -28,10 +27,10 @@ namespace EsotericRogue {
         }
 
         private int GetOffsetY() {
-            int offsetY = 1;
+            int offsetY = 0;
             if (Sprites != null) {
                 foreach (Sprite sprite in Sprites) {
-                    offsetY += sprite.Display.Split(Environment.NewLine).Length;
+                    offsetY += sprite.Display.Split(Environment.NewLine).Length - 1;
                 }
             }
             return offsetY;
@@ -74,21 +73,25 @@ namespace EsotericRogue {
             SelectedSprite = new Sprite(">", ConsoleColor.White, ConsoleColor.Black),
             DeselectedSprite = new Sprite(" ", ConsoleColor.White, ConsoleColor.Black);
         protected override void DisplayUI() {
+            DisplaySprites();
+            DisplayOptions();
+        }
+        protected void DisplaySprites() {
             if (Sprites != null) {
                 foreach (Sprite sprite in Sprites)
                     Renderer.Add(sprite);
-                Renderer.Add(Environment.NewLine);
             }
+        }
+        protected void DisplayOptions() {
             if (Options != null) {
                 for (int i = 0; i < Options.Count; i++) {
-                    Option option = Options[i];
-                    Renderer.Add(Environment.NewLine);
                     if (Selected && i == SelectedOptionIndex)
                         Renderer.Add(SelectedSprite);
                     else
                         Renderer.Add(DeselectedSprite);
-                    foreach (Sprite sprite in option.Sprites)
+                    foreach (Sprite sprite in Options[i].Sprites)
                         Renderer.Add(sprite);
+                    Renderer.Add(Environment.NewLine);
                 }
             }
         }

@@ -22,7 +22,7 @@ namespace EsotericRogue {
                 return new Sprite[] {
                     UI.CreateSprite(attackDescription + " for "),
                     new Sprite(damage.ToString(), ConsoleColor.Red, ConsoleColor.Black),
-                    new Sprite(" damage.")
+                    UI.CreateSprite(" damage.")
                 };
             }
         }
@@ -31,7 +31,7 @@ namespace EsotericRogue {
         public Character Character { get; internal set; }
         public Action this[int index] => Actions[index];
 
-        public override void Use(Character character) {
+        protected override void UseAction(Character character) {
             character.EquippedWeapon = this;
         }
 

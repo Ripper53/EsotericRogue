@@ -1,6 +1,6 @@
 ﻿namespace EsotericRogue {
     public abstract class SelectableUI : UI {
-        private bool selected;
+        private bool selected = false;
         public bool Selected {
             get => selected;
             set {
@@ -8,15 +8,16 @@
                 selected = value;
                 if (procEvents) {
                     if (selected)
-                        OnSelected();
+                        OnSelected?.Invoke(this);
                     else
-                        OnDeselected();
+                        OnDeselected?.Invoke(this);
                 }
             }
         }
-
-        protected abstract void OnSelected();
-        protected abstract void OnDeselected();
+        public delegate void SelectedAction(SelectableUI source);
+        public event SelectedAction OnSelected;
+        public delegate void DeselectedAction(SelectableUI source);
+        public event DeselectedAction OnDeselected;
 
         public abstract void Up();
         public abstract void Right();

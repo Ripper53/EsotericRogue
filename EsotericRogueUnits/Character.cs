@@ -40,7 +40,7 @@ namespace EsotericRogue {
             Stamina = new Resource();
             Mana = new Resource();
             Energy = new Resource();
-            Inventory = new Inventory();
+            Inventory = new Inventory(this);
             Brain = characterBrain;
             Brain.Character = this;
             enchantments = new Dictionary<string, Enchantment>();
@@ -70,7 +70,7 @@ namespace EsotericRogue {
         }
 
         private void Check() {
-            if (Health < 0) {
+            if (Health <= 0) {
                 Die();
                 Health = 0;
             } else if (Health > MaxHealth)

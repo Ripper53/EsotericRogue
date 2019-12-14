@@ -28,6 +28,13 @@ namespace EsotericRogue {
 
         public Unit GetUnit(Vector2 position) => unitsMap[position.x, position.y];
         public Tile GetTile(Vector2 position) => tilesMap[position.x, position.y];
+        public void SetUnit(Unit unit, Vector2 position) {
+            unitsMap[position.x, position.y] = unit;
+            unit.Position = position;
+            unit.Brain.Scene = this;
+            units.Add(unit);
+            Renderer.Display(unit.Sprite, position + new Vector2(1, 1));
+        }
         public void SetTile(Tile tile, Vector2 position) => tilesMap[position.x, position.y] = tile;
 
         public void SetSize(Vector2 size) {
@@ -101,13 +108,6 @@ namespace EsotericRogue {
         }
 
         #region Internal
-        public void SetUnit(Unit unit, Vector2 position) {
-            unitsMap[position.x, position.y] = unit;
-            unit.Position = position;
-            unit.Brain.Scene = this;
-            units.Add(unit);
-            Renderer.Display(unit.Sprite, position + new Vector2(1, 1));
-        }
         internal bool MoveUnit(Unit unit, Vector2 position) {
             if (InBounds(position) && tilesMap[position.x, position.y] != Tile.Wall) {
                 Vector2 oldPosition = unit.Position;
