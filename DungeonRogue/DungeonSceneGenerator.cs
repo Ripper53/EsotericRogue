@@ -25,30 +25,65 @@ namespace DungeonRogue {
             }
             GeneratePath(roomPositions[0], roomPositions[roomCount - 1]);
 
-            List<Vector2> openPositions = new List<Vector2>(Scene.Size.x * Scene.Size.y);
-            Vector2 GetRandomPosition() {
-                int index = rng.Next(openPositions.Count);
-                Vector2 pos = openPositions[index];
-                openPositions.RemoveAt(index);
-                return pos;
+            List<Vector2>
+                groundPositions = new List<Vector2>(Scene.Size.x * Scene.Size.y),
+                wallPositions = new List<Vector2>(Scene.Size.x * Scene.Size.y);
+
+            static Vector2? GetRandomPosition(List<Vector2> tileList) {
+                if (tileList.Count > 0) {
+                    int index = rng.Next(tileList.Count);
+                    Vector2 pos = tileList[index];
+                    tileList.RemoveAt(index);
+                    return pos;
+                }
+                return null;
             }
+            Vector2? GetRandomGroundPosition() => GetRandomPosition(groundPositions);
+            Vector2? GetRandomWallPosition() => GetRandomPosition(wallPositions);
             for (int y = 0; y < Scene.Size.y; y++) {
                 for (int x = 0; x < Scene.Size.x; x++) {
                     Vector2 pos = new Vector2(x, y);
                     switch (Scene.GetTile(pos)) {
                         case Scene.Tile.Ground:
-                            openPositions.Add(new Vector2(x, y));
+                            groundPositions.Add(pos);
+                            break;
+                        case Scene.Tile.Wall:
+                            wallPositions.Add(pos);
                             break;
                     }
                 }
             }
 
-            Vector2 end = GetRandomPosition();
-            Scene.SetTile(Scene.Tile.Exit, end);
+            Vector2? start = GetRandomGroundPosition();
+            if (start.HasValue)
+                SetPlayerUnit(start.Value);
+            else {
+                start = GetRandomWallPosition();
+                if (start.HasValue) {
+                    Scene.SetTile(Scene.Tile.Ground, start.Value);
+                    SetPlayerUnit(start.Value);
+                } else {
+                    return;
+                }
+            }
+            Vector2? end = GetRandomGroundPosition();
+            if (end.HasValue)
+                Scene.SetTile(Scene.Tile.Exit, end.Value);
+            else {
+                end = GetRandomWallPosition();
+                if (end.HasValue) {
+                    GeneratePath(start.Value, end.Value);
+                    Scene.SetTile(Scene.Tile.Exit, end.Value);
+                }
+            }
 
-            SpawnBandit(GetRandomPosition());
-
-            SetPlayerUnit(GetRandomPosition());
+            for (int i = 0; i < 1; i++) {
+                Vector2? pos = GetRandomGroundPosition();
+                if (pos.HasValue)
+                    SpawnBandit(pos.Value);
+                else
+                    break;
+            }
         }
 
         private void SpawnBandit(Vector2 position) {

@@ -15,10 +15,8 @@
             CharacterBrain = (PlayerCharacterBrain)Character.Brain;
             Input = new PlayerInput(gameManager, UnitBrain);
             InfoUI = new InfoUI(playerUnit.Character);
-            InventoryMenu = new InventoryMenu(Character);
+            InventoryMenu = new InventoryMenu(gameManager, Character);
             CharacterBrain.PlayerInfo = this;
-            gameManager.AddUI(InfoUI);
-            gameManager.AddUI(InventoryMenu);
         }
     }
 }

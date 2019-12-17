@@ -22,5 +22,12 @@ namespace EsotericRogue {
         protected abstract void Enchant(Character character);
         public void Disenchant() => Disenchant(character);
         protected abstract void Disenchant(Character character);
+
+        public interface IDamage {
+            int Damage { get; set; }
+        }
+        public interface IHeal {
+            int Heal { get; set; }
+        }
     }
 }

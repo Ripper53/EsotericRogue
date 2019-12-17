@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EsotericRogueRenderer\EsotericRogueRenderer.csproj" />
-    <ProjectReference Include="..\EsotericRogueUI\EsotericRogueUI.csproj" />
   </ItemGroup>
 
 </Project>

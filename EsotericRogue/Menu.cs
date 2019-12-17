@@ -4,10 +4,13 @@ using System.Collections.Generic;
 namespace EsotericRogue {
     public class Menu : SelectableUI {
         public IEnumerable<Sprite> Sprites;
-        public IList<Option> Options;
+        private readonly List<Option> options;
+        public IReadOnlyList<Option> Options => options;
         public int SelectedOptionIndex { get; private set; }
 
         public Menu() {
+            options = new List<Option>();
+
             OnSelected += OnSelected_Event;
             OnDeselected += OnDeselected_Event;
         }
@@ -15,8 +18,8 @@ namespace EsotericRogue {
         private void OnDeselected_Event(SelectableUI source) => WriteUnselected(SelectedOptionIndex);
 
         public Option GetSelectedOption() {
-            if (Options != null && Options.Count > 0)
-                return Options[SelectedOptionIndex];
+            if (options != null && options.Count > 0)
+                return options[SelectedOptionIndex];
             return null;
         }
 
@@ -24,6 +27,25 @@ namespace EsotericRogue {
             public IEnumerable<Sprite> Sprites;
             public delegate void OptionAction(Menu menu, Option option);
             public OptionAction Action;
+        }
+
+        public void ClearOptions() {
+            SelectedOptionIndex = 0;
+            options.Clear();
+        }
+        public void RemoveRangeOptions(int index, int count) {
+            SelectedOptionIndex = 0;
+            options.RemoveRange(index, count);
+        }
+
+        public void AddOption(Option option) {
+            options.Add(option);
+        }
+
+        public void RemoveOption(Option option) {
+            options.Remove(option);
+            if (SelectedOptionIndex == options.Count)
+                SelectedOptionIndex = 0;
         }
 
         private int GetOffsetY() {
@@ -37,26 +59,32 @@ namespace EsotericRogue {
         }
 
         private int WriteUnselected(int index) {
-            int offsetY = GetOffsetY();
-            Renderer.Display(DeselectedSprite, new Vector2(Position.x, Position.y + index + offsetY));
-            return offsetY;
+            if (options.Count > 0) {
+                int offsetY = GetOffsetY();
+                Renderer.Display(DeselectedSprite, new Vector2(Position.x, Position.y + index + offsetY));
+                return offsetY;
+            }
+            return 0;
         }
 
         private void WriteSelected(int previousIndex) {
-            int offsetY = WriteUnselected(previousIndex);
-            if (Selected) {
-                Renderer.Display(SelectedSprite, new Vector2(Position.x, Position.y + SelectedOptionIndex + offsetY));
+            if (options.Count > 1) {
+                int offsetY = WriteUnselected(previousIndex);
+                if (Selected) {
+                    Renderer.Display(SelectedSprite, new Vector2(Position.x, Position.y + SelectedOptionIndex + offsetY));
+                }
             }
         }
 
         private void WriteSelected() {
-            Renderer.Display(SelectedSprite, new Vector2(Position.x, Position.y + SelectedOptionIndex + GetOffsetY()));
+            if (options.Count > 0)
+                Renderer.Display(SelectedSprite, new Vector2(Position.x, Position.y + SelectedOptionIndex + GetOffsetY()));
         }
 
         public void NextOption() {
             int previousIndex = SelectedOptionIndex;
             SelectedOptionIndex++;
-            if (SelectedOptionIndex >= Options.Count)
+            if (SelectedOptionIndex >= options.Count)
                 SelectedOptionIndex = 0;
             WriteSelected(previousIndex);
         }
@@ -65,7 +93,7 @@ namespace EsotericRogue {
             int previousIndex = SelectedOptionIndex;
             SelectedOptionIndex--;
             if (SelectedOptionIndex < 0)
-                SelectedOptionIndex = Options.Count - 1;
+                SelectedOptionIndex = options.Count - 1;
             WriteSelected(previousIndex);
         }
 
@@ -83,16 +111,14 @@ namespace EsotericRogue {
             }
         }
         protected void DisplayOptions() {
-            if (Options != null) {
-                for (int i = 0; i < Options.Count; i++) {
-                    if (Selected && i == SelectedOptionIndex)
-                        Renderer.Add(SelectedSprite);
-                    else
-                        Renderer.Add(DeselectedSprite);
-                    foreach (Sprite sprite in Options[i].Sprites)
-                        Renderer.Add(sprite);
-                    Renderer.Add(Environment.NewLine);
-                }
+            for (int i = 0; i < options.Count; i++) {
+                if (Selected && i == SelectedOptionIndex)
+                    Renderer.Add(SelectedSprite);
+                else
+                    Renderer.Add(DeselectedSprite);
+                foreach (Sprite sprite in options[i].Sprites)
+                    Renderer.Add(sprite);
+                Renderer.Add(Environment.NewLine);
             }
         }
 

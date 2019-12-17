@@ -7,6 +7,7 @@ namespace EsotericRogue {
         public SceneGenerator SceneGenerator;
         private readonly List<UI> uis;
         internal readonly List<SelectableUI> selectableUIs;
+        public int SelectableUICount => selectableUIs.Count;
         private readonly BattleMenu battleMenu;
 
         public GameManager(Unit playerUnit) {
@@ -35,15 +36,19 @@ namespace EsotericRogue {
             if (ui is SelectableUI selectableUI) {
                 selectableUIs.Remove(selectableUI);
                 if (PlayerInfo.Input.SelectedUI == selectableUI)
-                    PlayerInfo.Input.SelectedUI = GetFirstSelectableUI();
+                    PlayerInfo.Input.SelectedUIIndex--;
             }
             return true;
         }
 
         public SelectableUI GetFirstSelectableUI() {
-            if (selectableUIs.Count > 0)
+            if (SelectableUICount > 0)
                 return selectableUIs[0];
             return null;
+        }
+
+        public int GetSelectableUIIndex(SelectableUI selectableUI) {
+            return selectableUIs.FindIndex(v => selectableUI == v);
         }
 
         /// <summary>
@@ -76,6 +81,9 @@ namespace EsotericRogue {
         public void Run() {
             Renderer.Clear();
             if (!Start()) return;
+
+            AddUI(PlayerInfo.InfoUI);
+            AddUI(PlayerInfo.InventoryMenu);
 
             Generate();
             while (true) {

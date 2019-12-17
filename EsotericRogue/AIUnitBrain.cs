@@ -12,15 +12,14 @@ namespace EsotericRogue {
                 action(this);
         }
 
-        public override bool Move(Vector2 position) {
-            if (Scene.InBounds(position)) {
+        public override bool CanMove(Vector2 position) {
+            if (base.CanMove(position)) {
                 Unit unit = Scene.GetUnit(position);
-                if (unit == null) {
-                    return base.Move(position);
-                } else if (unit.Brain is PlayerUnitBrain p) {
-                    p.PlayerInput.GameManager.Battle(this);
+                if (unit == null)
                     return true;
-                }
+                else if (unit.Brain is PlayerUnitBrain p)
+                    p.PlayerInput.GameManager.Battle(this);
+                return false;
             }
             return false;
         }

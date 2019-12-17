@@ -4,25 +4,16 @@ using System.Collections.Generic;
 
 namespace EsotericRogue {
     public abstract class Weapon : Item, IEnumerable<Weapon.Action> {
-        private string name;
-        public override string Name => name;
-        public void SetName(string name) => this.name = name;
-
-        public interface IDamage {
-            int Damage { get; set; }
-        }
-        public interface IHeal {
-            int Heal { get; set; }
-        }
+        public override bool Consumable => false;
 
         public abstract class Action {
             public abstract IEnumerable<Sprite> GetDescription();
 
             public static Sprite[] GetDamageDescription(string attackDescription, int damage) {
                 return new Sprite[] {
-                    UI.CreateSprite(attackDescription + " for "),
+                    Sprite.CreateUI(attackDescription + " for "),
                     new Sprite(damage.ToString(), ConsoleColor.Red, ConsoleColor.Black),
-                    UI.CreateSprite(" damage.")
+                    Sprite.CreateUI(" damage.")
                 };
             }
         }

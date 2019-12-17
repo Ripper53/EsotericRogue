@@ -5,8 +5,16 @@
 
         public abstract void Controls();
 
-        public virtual bool Move(Vector2 position) {
-            return Scene.MoveUnit(Unit, position);
+        public virtual bool CanMove(Vector2 position) {
+            return Scene.GetTile(position) == Scene.Tile.Ground;
+        }
+
+        public bool Move(Vector2 position) {
+            if (Scene.InBounds(position) && CanMove(position)) {
+                Scene.MoveUnit(Unit, position);
+                return true;
+            }
+            return false;
         }
     }
 }

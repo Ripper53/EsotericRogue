@@ -18,26 +18,41 @@ namespace EsotericRogue {
                 Character.Stamina.ValueChanged += Stamina_ValueChanged;
                 Character.Mana.ValueChanged += Mana_ValueChanged;
                 Character.Energy.ValueChanged += Energy_ValueChanged;
+                Character.WeaponEquipped += Character_WeaponEquipped;
             };
             Deactivated += source => {
                 Character.HealthChanged -= Character_HealthChanged;
                 Character.Stamina.ValueChanged -= Stamina_ValueChanged;
                 Character.Mana.ValueChanged -= Mana_ValueChanged;
                 Character.Energy.ValueChanged -= Energy_ValueChanged;
+                Character.WeaponEquipped -= Character_WeaponEquipped;
             };
         }
+
         #region Events
+        private static Sprite GetHealthSprite(Character character) => GetSprite(character.Health, character.MaxHealth);
+        private Vector2 GetHealthPosition(Vector2 position) => position + new Vector2(8, OffsetY);
         private void Character_HealthChanged(Character character, int oldHealth) {
-            Renderer.Display(GetSprite(character.Health, character.MaxHealth), Position + new Vector2(8, OffsetY));
+            Renderer.Display(GetSprite(character.Health, character.MaxHealth), GetHealthPosition(Position));
         }
+        private Vector2 GetStaminaPosition(Vector2 position) => position + new Vector2(8, OffsetY + 1);
         private void Stamina_ValueChanged(Resource resource, int oldValue) {
-            Renderer.Display(GetSprite(resource), Position + new Vector2(8, OffsetY + 1));
+            Renderer.Display(GetSprite(resource), GetStaminaPosition(Position));
         }
+        private Vector2 GetManaPosition(Vector2 position) => position + new Vector2(8, OffsetY + 2);
         private void Mana_ValueChanged(Resource resource, int oldValue) {
-            Renderer.Display(GetSprite(resource), Position + new Vector2(8, OffsetY + 2));
+            Renderer.Display(GetSprite(resource), GetManaPosition(Position));
         }
+        private Vector2 GetEnergyPosition(Vector2 position) => position + new Vector2(8, OffsetY + 3);
         private void Energy_ValueChanged(Resource resource, int oldValue) {
-            Renderer.Display(GetSprite(resource), Position + new Vector2(8, OffsetY + 3));
+            Renderer.Display(GetSprite(resource), GetEnergyPosition(Position));
+        }
+        private Vector2 GetWeaponEquippedPosition(Vector2 position) => position + new Vector2(8, OffsetY + 5);
+        private string GetWeaponName(Weapon weapon) => GetContinuedString(weapon.Name.PadRight(lastWeaponName.Length), 12);
+        private string lastWeaponName = string.Empty;
+        private void Character_WeaponEquipped(Character character, Weapon weapon, Weapon oldWeapon) {
+            lastWeaponName = GetWeaponName(weapon);
+            Renderer.Display(Sprite.CreateUI(lastWeaponName), GetWeaponEquippedPosition(Position));
         }
         #endregion
 
@@ -60,25 +75,38 @@ namespace EsotericRogue {
 
         protected override void DisplayUI() {
             const int maxLength = 17;
-            NameSprite.Display = GetStringFill(GetStringMax(Character.Name, maxLength), maxLength) + Environment.NewLine;
+            NameSprite.Display = GetStringPadRight(GetContinuedString(Character.Name, maxLength), maxLength) + Environment.NewLine;
             Renderer.Add(NameSprite);
             if (Sprites != null) {
-                foreach (Sprite sprite in Sprites)
-                    Renderer.Add(sprite);
+                foreach (Sprite s in Sprites)
+                    Renderer.Add(s);
             }
             Renderer.Add(Character.HealthSprite);
-            Renderer.Add(Environment.NewLine.PadLeft(4));
+            Renderer.Add("  " + Environment.NewLine);
             Renderer.Add(Character.StaminaSprite);
-            Renderer.Add(Environment.NewLine.PadLeft(3));
+            Renderer.Add(" " + Environment.NewLine);
             Renderer.Add(Character.ManaSprite);
-            Renderer.Add(Environment.NewLine.PadLeft(6));
+            Renderer.Add("    " + Environment.NewLine);
             Renderer.Add(Character.EnergySprite);
-            Renderer.Add("  ");
+            Renderer.Add("  " + Environment.NewLine);
+
+            Renderer.Add(new Sprite("Equipment" + Environment.NewLine));
+            Renderer.Add(new Sprite("Weapon: "));
 
             Character_HealthChanged(Character, Character.Health);
             Stamina_ValueChanged(Character.Stamina, Character.Stamina.Value);
             Mana_ValueChanged(Character.Mana, Character.Mana.Value);
             Energy_ValueChanged(Character.Energy, Character.Energy.Value);
+            Character_WeaponEquipped(Character, Character.EquippedWeapon, Character.EquippedWeapon);
+        }
+
+        public override void Clear() {
+            base.Clear();
+            Renderer.Display(Sprite.CreateEmptyUI(GetHealthSprite(Character).Display.Length), GetHealthPosition(DisplayPosition));
+            Renderer.Display(Sprite.CreateEmptyUI(GetSprite(Character.Stamina).Display.Length), GetStaminaPosition(DisplayPosition));
+            Renderer.Display(Sprite.CreateEmptyUI(GetSprite(Character.Mana).Display.Length), GetManaPosition(DisplayPosition));
+            Renderer.Display(Sprite.CreateEmptyUI(GetSprite(Character.Energy).Display.Length), GetEnergyPosition(DisplayPosition));
+            Renderer.Display(Sprite.CreateEmptyUI(GetWeaponName(Character.EquippedWeapon).Length), GetWeaponEquippedPosition(DisplayPosition));
         }
     }
 }

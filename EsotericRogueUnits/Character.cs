@@ -22,15 +22,19 @@ namespace EsotericRogue {
         private readonly Dictionary<string, Enchantment> enchantments;
 
         private readonly Weapon bareWeapon;
+        public delegate void WeaponEquippedAction(Character character, Weapon weapon, Weapon oldWeapon);
+        public event WeaponEquippedAction WeaponEquipped;
         private Weapon equippedWeapon;
         public Weapon EquippedWeapon {
             get => equippedWeapon;
             set {
-                equippedWeapon.Character = null;
+                Weapon oldWeapon = equippedWeapon;
+                oldWeapon.Character = null;
                 if (value == null)
                     value = bareWeapon;
                 equippedWeapon = value;
                 equippedWeapon.Character = this;
+                WeaponEquipped?.Invoke(this, equippedWeapon, oldWeapon);
             }
         }
 
@@ -46,6 +50,7 @@ namespace EsotericRogue {
             enchantments = new Dictionary<string, Enchantment>();
             this.bareWeapon = bareWeapon;
             equippedWeapon = bareWeapon;
+            Inventory.AddItem(bareWeapon);
         }
 
         internal void Enchant(Enchantment enchantment) {

@@ -29,14 +29,17 @@ namespace EsotericRogue {
             }
         }
 
-        public override bool Move(Vector2 position) {
-            if (Scene.InBounds(position)) {
-                Unit enemyUnit = Scene.GetUnit(position);
-                if (enemyUnit != null)
-                    PlayerInput.GameManager.Battle(enemyUnit.Brain);
-                return base.Move(position);
+        public override bool CanMove(Vector2 position) {
+            switch (Scene.GetTile(position)) {
+                case Scene.Tile.Ground:
+                case Scene.Tile.Exit:
+                    Unit enemyUnit = Scene.GetUnit(position);
+                    if (enemyUnit != null)
+                        PlayerInput.GameManager.Battle(enemyUnit.Brain);
+                    return true;
+                default:
+                    return false;
             }
-            return false;
         }
     }
 }

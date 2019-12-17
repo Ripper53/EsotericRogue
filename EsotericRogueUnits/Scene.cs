@@ -108,15 +108,11 @@ namespace EsotericRogue {
         }
 
         #region Internal
-        internal bool MoveUnit(Unit unit, Vector2 position) {
-            if (InBounds(position) && tilesMap[position.x, position.y] != Tile.Wall) {
-                Vector2 oldPosition = unit.Position;
-                unitsMap[oldPosition.x, oldPosition.y] = null;
-                DisplayTile(oldPosition);
-                SetUnit(unit, position);
-                return true;
-            }
-            return false;
+        internal void MoveUnit(Unit unit, Vector2 position) {
+            Vector2 oldPosition = unit.Position;
+            unitsMap[oldPosition.x, oldPosition.y] = null;
+            DisplayTile(oldPosition);
+            SetUnit(unit, position);
         }
         #endregion
 

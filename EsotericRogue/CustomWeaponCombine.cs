@@ -1,65 +1,10 @@
 ﻿using System.Collections.Generic;
 
 namespace EsotericRogue {
-    public class CombinedWeapon : Weapon<CombinedWeapon> {
-        protected static readonly System.Random rng = new System.Random();
-        private readonly Action[] actions;
-        protected override IList<Weapon.Action> Actions => actions;
+    public partial class CustomWeapon {
 
-        #region Actions
-        private class DamageAction : Action, IDamage {
-            public readonly string Description;
-            public int Damage { get; set; }
-
-            public DamageAction(string description) {
-                Description = description;
-            }
-
-            public override void Execute(CombinedWeapon source, Character targetCharacter) {
-                throw new System.NotImplementedException();
-            }
-
-            public override IEnumerable<Sprite> GetDescription() {
-                return GetDamageDescription(Description, Damage);
-            }
-        }
-        private class HealAction : Action, IHeal {
-            public readonly string Description;
-            public int Heal { get; set; }
-
-            public HealAction(string description) {
-                Description = description;
-            }
-
-            public override void Execute(CombinedWeapon source, Character targetCharacter) {
-                throw new System.NotImplementedException();
-            }
-
-            public override IEnumerable<Sprite> GetDescription() {
-                throw new System.NotImplementedException();
-            }
-        }
-        private class DamageHealAction : Action, IDamage, IHeal {
-            public readonly string Description;
-            public int Damage { get; set; }
-            public int Heal { get; set; }
-
-            public DamageHealAction(string description) {
-                Description = description;
-            }
-
-            public override void Execute(CombinedWeapon source, Character targetCharacter) {
-                throw new System.NotImplementedException();
-            }
-
-            public override IEnumerable<Sprite> GetDescription() {
-                throw new System.NotImplementedException();
-            }
-        }
-        #endregion
-
-        public CombinedWeapon(Weapon weapon1, Weapon weapon2) {
-            SetName("Combined " + weapon1.Name);
+        public CustomWeapon(Weapon weapon1, Weapon weapon2) {
+            SetName(weapon1.Name);
 
             #region Prep
             int weapon1Count = weapon1.Count, weapon2Count = weapon2.Count;
@@ -95,8 +40,8 @@ namespace EsotericRogue {
 
         private static Action Combine(Action action1, Action action2) {
             bool
-                bothDamage = AreBoth(action1, action2, out IDamage damageAction1, out IDamage damageAction2),
-                bothHeal = AreBoth(action1, action2, out IHeal healAction1, out IHeal healAction2);
+                bothDamage = AreBoth(action1, action2, out Enchantment.IDamage damageAction1, out Enchantment.IDamage damageAction2),
+                bothHeal = AreBoth(action1, action2, out Enchantment.IHeal healAction1, out Enchantment.IHeal healAction2);
 
             if (bothDamage && bothHeal) {
                 DamageHealAction action = new DamageHealAction("");
@@ -131,10 +76,10 @@ namespace EsotericRogue {
             return false;
         }
 
-        private static void Combine(IDamage action, IDamage damageAction1, IDamage damageAction2) {
+        private static void Combine(Enchantment.IDamage action, Enchantment.IDamage damageAction1, Enchantment.IDamage damageAction2) {
             action.Damage = damageAction1.Damage + damageAction2.Damage;
         }
-        private static void Combine(IHeal action, IHeal healAction1, IHeal healAction2) {
+        private static void Combine(Enchantment.IHeal action, Enchantment.IHeal healAction1, Enchantment.IHeal healAction2) {
             action.Heal = healAction1.Heal + healAction2.Heal;
         }
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace EsotericRogue {
     public class BattleMenu : Menu {
@@ -13,20 +12,20 @@ namespace EsotericRogue {
             PlayerInfo = playerInfo;
             PlayerCharacter = PlayerInfo.Character;
             PlayerCharacter.Died += source => playerAlive = false;
-            Position = new Vector2(0, 6);
-            Options = new List<Option>(2) {
+            Position = new Vector2(0, 8);
+            AddOption(
                 new Option() {
                     Sprites = new Sprite[] {
-                        CreateSprite("Skip")
+                        Sprite.CreateUI("Skip")
                     },
                     Action = (menu, op) => {
                         enemyTurn = true;
                         PlayerInfo.CharacterBrain.Description = new Sprite[] {
-                            CreateSprite("Skip.")
+                            Sprite.CreateUI("Skip.")
                         };
                     }
                 }
-            };
+            );
         }
 
         /// <summary>
@@ -44,20 +43,22 @@ namespace EsotericRogue {
             };
             GameManager.AddUI(vsText);
 
-            const int playerDescriptionPosX = 64, enemyDescriptionPosX = 40;
+            const int playerDescriptionPosX = 70, enemyDescriptionPosX = 40;
             TextUI playerNameDescriptionText = new TextUI() {
                 Sprites = new Sprite[] {
-                    new Sprite(PlayerCharacter.Name + " Actions:")
+                    new Sprite(GetContinuedString(PlayerCharacter.Name, 12) + " Actions:")
                 },
-                Position = new Vector2(playerDescriptionPosX, 0)
+                Position = new Vector2(playerDescriptionPosX, 0),
+                Width = 20
             };
             GameManager.AddUI(playerNameDescriptionText);
 
             TextUI enemyNameDescriptionText = new TextUI() {
                 Sprites = new Sprite[] {
-                    new Sprite(character.Name + " Actions:")
+                    new Sprite(GetContinuedString(character.Name, 12) + " Actions:")
                 },
-                Position = new Vector2(enemyDescriptionPosX, 0)
+                Position = new Vector2(enemyDescriptionPosX, 0),
+                Width = 20
             };
             GameManager.AddUI(enemyNameDescriptionText);
 
@@ -82,33 +83,45 @@ namespace EsotericRogue {
             Vector2 previousInfoUIPos = GameManager.PlayerInfo.InfoUI.Position;
             GameManager.PlayerInfo.InfoUI.Position = new Vector2(0, 0);
             Vector2 previousInventoryMenuPos = GameManager.PlayerInfo.InventoryMenu.Position;
-            GameManager.PlayerInfo.InventoryMenu.Position = new Vector2(84, 0);
+            GameManager.PlayerInfo.InventoryMenu.Position = new Vector2(playerDescriptionPosX + (playerDescriptionPosX - enemyDescriptionPosX), 0);
 
             // Battle
-            GameManager.Display();
+            GameManager.PlayerInfo.Input.SelectedUIIndex = GameManager.GetSelectableUIIndex(this);
+            GameManager.PlayerInfo.InfoUI.Clear();
+            GameManager.PlayerInfo.InventoryMenu.Clear();
+            GameManager.DisplayUI();
             bool enemyAlive = true;
             character.Died += source => enemyAlive = false;
             while (enemyAlive) {
                 if (!playerAlive) {
+                    PlayerInfo.Input.DeselectUI();
                     GameManager.RemoveUI(this);
                     Renderer.Clear();
                     GameManager.DisplayUI();
                     Renderer.Display(
-                        CreateSprite("Game Over!" + Environment.NewLine),
+                        Sprite.CreateUI($"Game Over!{Environment.NewLine}Enter 'E' to continue...{Environment.NewLine}"),
                         new Vector2(0, 7)
                     );
-                    Renderer.ReadLine();
+                    string exitCode;
+                    do {
+                        exitCode = Renderer.ReadLine().ToUpper();
+                    } while (exitCode != "E" && exitCode != "'E'");
                     return false;
                 }
                 if (PlayerInfo.Input.SelectedUI == null)
-                    PlayerInfo.Input.SelectedUI = this;
+                    PlayerInfo.Input.SelectedUIIndex = 0;
                 PlayerCharacter.Brain.Controls(character);
                 if (enemyAlive && enemyTurn) {
+                    PlayerCharacter.Step();
                     enemyTurn = false;
                     character.Brain.Controls(PlayerCharacter);
+                    character.Step();
+                    // Display
+                    enemyDescriptionText.Clear();
+                    playerDescriptionText.Clear();
                     enemyDescriptionText.Sprites = character.Brain.GetDescription();
-                    enemyDescriptionText.Display();
                     playerDescriptionText.Sprites = PlayerCharacter.Brain.GetDescription();
+                    enemyDescriptionText.Display();
                     playerDescriptionText.Display();
                 }
             }

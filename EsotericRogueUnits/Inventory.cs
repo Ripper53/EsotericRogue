@@ -36,7 +36,7 @@ namespace EsotericRogue {
         }
 
         public IEnumerator<Item> GetEnumerator() {
-            return (IEnumerator<Item>)items;
+            return items.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {

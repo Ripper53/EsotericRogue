@@ -3,7 +3,7 @@
         private bool selected = false;
         public bool Selected {
             get => selected;
-            set {
+            internal set {
                 bool procEvents = selected != value;
                 selected = value;
                 if (procEvents) {

@@ -4,13 +4,18 @@ using System.Collections.Generic;
 namespace EsotericRogue {
     public static class Renderer {
         private static readonly List<Sprite> sprites = new List<Sprite>();
+        public static IReadOnlyList<Sprite> Sprites => sprites;
         private static Sprite GetLatest() {
             if (sprites.Count > 0)
                 return sprites[^1];
             return null;
         }
 
-        public static void Clear() => Console.Clear();
+        public static void Clear() {
+            // Set background color to black before clear so the unfilled background is black.
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Clear();
+        }
 
         private static void SetUp(Sprite sprite) {
             Console.ForegroundColor = sprite.Foreground;
@@ -52,7 +57,6 @@ namespace EsotericRogue {
         }
 
         public static void Display(Vector2 position) {
-            int startX = position.x;
             Console.SetCursorPosition(position.x, position.y);
             foreach (Sprite sprite in sprites) {
                 SetUp(sprite);
@@ -65,7 +69,6 @@ namespace EsotericRogue {
                         Console.WriteLine(lines[i]);
                     }
                     Console.CursorLeft = position.x;
-                    position.x = startX;
                     Console.Write(lines[count]);
                 } else {
                     foreach (string line in lines) {
