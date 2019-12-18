@@ -54,7 +54,7 @@ namespace EsotericRogue {
         }
 
         public ConsoleKeyInfo GetInput() {
-            LatestKeyInfo = Console.ReadKey(true);
+            LatestKeyInfo = Renderer.ReadKey();
             return LatestKeyInfo;
         }
 

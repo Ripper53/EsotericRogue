@@ -11,6 +11,31 @@ namespace EsotericRogue {
             return null;
         }
 
+        public static int BufferWidth {
+            get => Console.BufferWidth;
+            set {
+                if (value < Console.WindowWidth)
+                    value = Console.WindowWidth;
+                else if (value >= short.MaxValue)
+                    value = short.MaxValue - 1;
+                Console.BufferWidth = value;
+            }
+        }
+        public static int BufferHeight {
+            get => Console.BufferHeight;
+            set {
+                if (value < Console.WindowHeight)
+                    value = Console.WindowHeight;
+                else if (value >= short.MaxValue)
+                    value = short.MaxValue - 1;
+                Console.BufferHeight = value;
+            }
+        }
+
+        public static ConsoleKeyInfo ReadKey() {
+            return Console.ReadKey(true);
+        }
+
         public static void Clear() {
             // Set background color to black before clear so the unfilled background is black.
             Console.BackgroundColor = ConsoleColor.Black;
@@ -57,6 +82,7 @@ namespace EsotericRogue {
         }
 
         public static void Display(Vector2 position) {
+            int startX = position.x;
             Console.SetCursorPosition(position.x, position.y);
             foreach (Sprite sprite in sprites) {
                 SetUp(sprite);
@@ -64,18 +90,22 @@ namespace EsotericRogue {
                 if (lines.Length > 1) {
                     // If there is more than 1 line, then we need to make sure the last line does not create a new line!
                     int count = lines.Length - 1;
+                    // count will always be greater than 0.
+                    // Runs loop at least once because of previous condition.
                     for (int i = 0; i < count; i++) {
                         Console.CursorLeft = position.x;
                         Console.WriteLine(lines[i]);
+                        position.x = startX;
                     }
                     Console.CursorLeft = position.x;
                     Console.Write(lines[count]);
-                } else {
-                    foreach (string line in lines) {
-                        Console.CursorLeft = position.x;
-                        position.x += line.Length;
-                        Console.Write(line);
-                    }
+                    position.x += lines[count].Length;
+                } else if (lines.Length == 1) {
+                    // There is only one line, no new lines at all which means it can continue on.
+                    Console.CursorLeft = position.x;
+                    Console.Write(lines[0]);
+                    // Add the length of line so next sprite continues where it left off.
+                    position.x += lines[0].Length;
                 }
             }
             sprites.Clear();

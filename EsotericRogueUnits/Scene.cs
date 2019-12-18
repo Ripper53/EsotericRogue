@@ -24,7 +24,7 @@ namespace EsotericRogue {
         private Unit[,] unitsMap;
         private Tile[,] tilesMap;
         private readonly HashSet<Unit> units = new HashSet<Unit>();
-        public IEnumerable<Unit> Units => units;
+        public IReadOnlyCollection<Unit> Units => units;
 
         public Unit GetUnit(Vector2 position) => unitsMap[position.x, position.y];
         public Tile GetTile(Vector2 position) => tilesMap[position.x, position.y];
@@ -80,7 +80,6 @@ namespace EsotericRogue {
             for (int x = -2; x < Size.x; x++)
                 Renderer.Add(BorderSprite);
             Renderer.Add(Environment.NewLine);
-            Renderer.Clear();
             Renderer.Display();
         }
 

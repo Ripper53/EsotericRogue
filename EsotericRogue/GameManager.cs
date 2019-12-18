@@ -59,6 +59,7 @@ namespace EsotericRogue {
         private void Generate() {
             SceneGenerator.Generate();
             // Render
+            Renderer.Clear();
             Display();
         }
 

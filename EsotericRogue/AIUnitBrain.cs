@@ -12,8 +12,12 @@ namespace EsotericRogue {
                 action(this);
         }
 
-        public override bool CanMove(Vector2 position) {
-            if (base.CanMove(position)) {
+        protected virtual bool CanMoveCheck(Vector2 position) {
+            return base.CanMove(position);
+        }
+
+        public sealed override bool CanMove(Vector2 position) {
+            if (CanMoveCheck(position)) {
                 Unit unit = Scene.GetUnit(position);
                 if (unit == null)
                     return true;

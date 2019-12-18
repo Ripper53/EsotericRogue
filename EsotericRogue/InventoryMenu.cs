@@ -108,11 +108,11 @@ namespace EsotericRogue {
                 foreach (Item item in Character.Inventory)
                     AddOption(Character.Inventory, item);
 
-                Character.Inventory.AddedItem += Inventory_AddedItem;
+                Character.Inventory.AddedItem += AddOption;
                 Character.Inventory.RemovedItem += Inventory_RemovedItem;
             };
             Deactivated += source => {
-                Character.Inventory.AddedItem -= Inventory_AddedItem;
+                Character.Inventory.AddedItem -= AddOption;
                 Character.Inventory.RemovedItem -= Inventory_RemovedItem;
             };
         }
@@ -149,9 +149,6 @@ namespace EsotericRogue {
             }
         }
 
-        private void Inventory_AddedItem(Inventory inventory, Item addedItem) {
-            AddOption(inventory, addedItem);
-        }
         private void Inventory_RemovedItem(Inventory inventory, Item removedItem) {
             RemoveOption(removedItem);
         }
@@ -160,10 +157,9 @@ namespace EsotericRogue {
         protected override void DisplayUI() {
             string name = GetContinuedString(Character.Name, 12);
             StringBuilder stringBuilder = new StringBuilder(name, name.Length + 2);
-            if (Character.Name.EndsWith('s')) {
-                stringBuilder.Append('\'');
-            } else {
-                stringBuilder.Append("'s");
+            stringBuilder.Append('\'');
+            if (!Character.Name.EndsWith('s')) {
+                stringBuilder.Append('s');
             }
             nameSprite.Display = stringBuilder.ToString();
             stringBuilder.Clear();

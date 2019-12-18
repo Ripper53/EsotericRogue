@@ -5,6 +5,8 @@ namespace EsotericRogue {
         public readonly GameManager GameManager;
         public readonly PlayerInfo PlayerInfo;
         public readonly Character PlayerCharacter;
+        private Character enemyCharacter;
+        private bool inBattle = false;
 
         private bool playerAlive = true, enemyTurn = false;
         public BattleMenu(GameManager gameManager, PlayerInfo playerInfo) {
@@ -26,12 +28,42 @@ namespace EsotericRogue {
                     }
                 }
             );
+
+            PlayerCharacter.WeaponEquipped += PlayerCharacter_WeaponEquipped;
+            PlayerCharacter_WeaponEquipped(PlayerCharacter, PlayerCharacter.EquippedWeapon, null);
+        }
+
+        private void PlayerCharacter_WeaponEquipped(Character character, Weapon weapon, Weapon oldWeapon) {
+            ClearWeaponOptions();
+            for (int i = 0; i < weapon.Count; i++) {
+                Weapon.Action action = weapon[i];
+                int index = i;
+                AddOption(new Option() {
+                    Sprites = action.GetDescription(),
+                    Action = (menu, op) => {
+                        weapon.Use(index, enemyCharacter);
+                        PlayerInfo.CharacterBrain.Description = weapon[index].GetDescription();
+                        enemyTurn = true;
+                    }
+                });
+            }
+            if (inBattle) {
+                Clear();
+                Display();
+            }
+        }
+
+        private void ClearWeaponOptions() {
+            if (Options.Count > 1)
+                RemoveRangeOptions(1, Options.Count - 1);
         }
 
         /// <summary>
         /// Returns true if battle was won, otherwise false.
         /// </summary>
         public bool Battle(Character character) {
+            enemyTurn = false;
+            enemyCharacter = character;
             // Prep
             GameManager.AddUI(this);
 
@@ -92,6 +124,7 @@ namespace EsotericRogue {
             GameManager.DisplayUI();
             bool enemyAlive = true;
             character.Died += source => enemyAlive = false;
+            inBattle = true;
             while (enemyAlive) {
                 if (!playerAlive) {
                     PlayerInfo.Input.DeselectUI();
@@ -112,8 +145,8 @@ namespace EsotericRogue {
                     PlayerInfo.Input.SelectedUIIndex = 0;
                 PlayerCharacter.Brain.Controls(character);
                 if (enemyAlive && enemyTurn) {
-                    PlayerCharacter.Step();
                     enemyTurn = false;
+                    PlayerCharacter.Step();
                     character.Brain.Controls(PlayerCharacter);
                     character.Step();
                     // Display
@@ -125,9 +158,11 @@ namespace EsotericRogue {
                     playerDescriptionText.Display();
                 }
             }
+            inBattle = false;
 
             // Drop
             PlayerCharacter.Inventory.Gold += character.Inventory.Gold;
+
 
             // Clean up
             GameManager.RemoveUI(this);
@@ -139,6 +174,9 @@ namespace EsotericRogue {
             GameManager.RemoveUI(enemyNameDescriptionText);
             GameManager.RemoveUI(playerDescriptionText);
             GameManager.RemoveUI(enemyDescriptionText);
+            GameManager.PlayerInfo.Input.DeselectUI();
+            Renderer.Clear();
+            GameManager.Display();
             return true;
         }
     }

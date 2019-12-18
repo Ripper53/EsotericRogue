@@ -60,6 +60,13 @@ namespace DungeonRogue {
                 }
             };
             void setMapSize(Vector2 size) {
+                Vector2 bufferSize = new Vector2(size.x + 20, size.y);
+                if (bufferSize.x < 120)
+                    bufferSize.x = 120;
+                if (bufferSize.y < 20)
+                    bufferSize.y = 20;
+                Renderer.BufferWidth = bufferSize.x;
+                Renderer.BufferHeight = bufferSize.y;
                 Scene.SetSize(size);
                 PlayerInfo.InfoUI.Position = new Vector2(size.x + 2, 0);
                 PlayerInfo.InventoryMenu.Position = new Vector2(size.x + 2, 7);

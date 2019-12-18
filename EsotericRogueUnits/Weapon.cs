@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace EsotericRogue {
-    public abstract class Weapon : Item, IEnumerable<Weapon.Action> {
+    public abstract class Weapon : Item, IReadOnlyList<Weapon.Action> {
         public override bool Consumable => false;
 
         public abstract class Action {
