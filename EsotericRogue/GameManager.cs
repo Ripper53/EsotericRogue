@@ -64,7 +64,7 @@ namespace EsotericRogue {
         }
 
         public void Display() {
-            Scene.Display();
+            PlayerInfo.UnitBrain.Display();
             DisplayUI();
         }
         public void DisplayUI() {
@@ -109,6 +109,13 @@ namespace EsotericRogue {
                                         // If Unit has a brain and it is not the Player's brain, execute controls.
                                         if (unit.Brain != null && unit.Brain != brain)
                                             unit.Brain.Controls();
+                                    }
+                                    // Display any units in view!
+                                    foreach (Unit unit in Scene.Units) {
+                                        if (brain.ViewPositions.Contains(unit.PreviousPosition))
+                                            Scene.DisplayTile(unit.PreviousPosition);
+                                        if (brain.ViewPositions.Contains(unit.Position))
+                                            Scene.DisplayUnit(unit.Position);
                                     }
                                 }
                                 // If any enemies were met, battle them.

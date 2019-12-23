@@ -7,13 +7,15 @@ namespace EsotericRogue {
             BorderSprite,
             GroundSprite,
             WallSprite,
-            ExitSprite;
+            ExitSprite,
+            FogSprite;
 
         static Scene() {
             GroundSprite = new Sprite(" ");
             WallSprite = new Sprite(" ", background: ConsoleColor.Black);
             BorderSprite = WallSprite;
             ExitSprite = new Sprite("O", foreground: ConsoleColor.DarkMagenta);
+            FogSprite = new Sprite(" ", background: ConsoleColor.Black);
         }
 
         public enum Tile {
@@ -33,7 +35,7 @@ namespace EsotericRogue {
             unit.Position = position;
             unit.Brain.Scene = this;
             units.Add(unit);
-            Renderer.Display(unit.Sprite, position + new Vector2(1, 1));
+            //Renderer.Display(unit.Sprite, position + new Vector2(1, 1)); ? Don't display unit since it might be in fog!
         }
         public void SetTile(Tile tile, Vector2 position) => tilesMap[position.x, position.y] = tile;
 
@@ -59,32 +61,8 @@ namespace EsotericRogue {
                 position.x < Size.x && position.y < Size.y;
         }
 
-        public void Display() {
-            // Offset by 2 because of left border and Size.x + 1 to reach the right side.
-            for (int x = -2; x < Size.x; x++)
-                Renderer.Add(BorderSprite);
-            Renderer.Add(Environment.NewLine);
-            for (int y = 0; y < Size.y; y++) {
-                Renderer.Add(BorderSprite);
-                for (int x = 0; x < Size.x; x++) {
-                    Unit unit = unitsMap[x, y];
-                    if (unit != null) {
-                        Renderer.Add(unit.Sprite);
-                    } else {
-                        Renderer.Add(GetTileSprite(x, y));
-                    }
-                }
-                Renderer.Add(BorderSprite);
-                Renderer.Add(Environment.NewLine);
-            }
-            for (int x = -2; x < Size.x; x++)
-                Renderer.Add(BorderSprite);
-            Renderer.Add(Environment.NewLine);
-            Renderer.Display();
-        }
-
-        private Sprite GetTileSprite(int x, int y) {
-            switch (tilesMap[x, y]) {
+        public Sprite GetTileSprite(Vector2 position) {
+            switch (tilesMap[position.x, position.y]) {
                 case Tile.Wall:
                     return WallSprite;
                 case Tile.Ground:
@@ -94,9 +72,23 @@ namespace EsotericRogue {
             }
         }
 
-        private void DisplayTile(Vector2 position) {
+        private void DisplaySprite(Sprite sprite, Vector2 position) {
             // Add (1, 1) to offset by border.
-            Renderer.Display(GetTileSprite(position.x, position.y), position + new Vector2(1, 1));
+            Renderer.Display(sprite, position + new Vector2(1, 1));
+        }
+
+        public void DisplayFog(Vector2 position) {
+            DisplaySprite(FogSprite, position);
+        }
+
+        public void DisplayTile(Vector2 position) {
+            DisplaySprite(GetTileSprite(position), position);
+        }
+
+        public void DisplayUnit(Vector2 position) {
+            Unit unit = GetUnit(position);
+            if (unit != null)
+                DisplaySprite(unit.Sprite, unit.Position);
         }
 
         public void DestroyUnit(Unit unit) {
@@ -110,7 +102,7 @@ namespace EsotericRogue {
         internal void MoveUnit(Unit unit, Vector2 position) {
             Vector2 oldPosition = unit.Position;
             unitsMap[oldPosition.x, oldPosition.y] = null;
-            DisplayTile(oldPosition);
+            //DisplayTile(oldPosition); ? Don't display tile, since the tile might not be in sight of player!
             SetUnit(unit, position);
         }
         #endregion

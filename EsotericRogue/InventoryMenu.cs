@@ -130,6 +130,7 @@ namespace EsotericRogue {
                 previousMenu = null;
             menu.Clear();
             GameManager.RemoveUI(menu);
+            GameManager.PlayerInfo.Input.SelectedUIIndex = GameManager.GetSelectableUIIndex(this);
         }
 
         public InventoryMenu(GameManager gameManager, Character character) {

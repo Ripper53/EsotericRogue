@@ -1,7 +1,15 @@
 ﻿namespace EsotericRogue {
     public class Unit {
         public Sprite Sprite;
-        public Vector2 Position { get; internal set; }
+        public Vector2 PreviousPosition { get; private set; }
+        private Vector2 position;
+        public Vector2 Position {
+            get => position;
+            internal set {
+                PreviousPosition = position;
+                position = value;
+            }
+        }
         public readonly Character Character;
         public readonly UnitBrain Brain;
 
