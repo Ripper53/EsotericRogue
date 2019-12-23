@@ -10,13 +10,16 @@
         public abstract bool Consumable { get; }
         public Inventory Inventory { get; internal set; }
 
-        public void Use(Character character) {
-            if (Consumable) {
-                Inventory.RemoveItem(this);
-                Inventory = null;
+        public bool Use(Character character) {
+            if (UseAction(character)) {
+                if (Consumable) {
+                    Inventory.RemoveItem(this);
+                    Inventory = null;
+                }
+                return true;
             }
-            UseAction(character);
+            return false;
         }
-        protected abstract void UseAction(Character character);
+        protected abstract bool UseAction(Character character);
     }
 }

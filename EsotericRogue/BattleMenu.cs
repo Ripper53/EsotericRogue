@@ -6,10 +6,22 @@ namespace EsotericRogue {
         public readonly PlayerInfo PlayerInfo;
         public readonly Character PlayerCharacter;
         private Character enemyCharacter;
+        private int oldDistance, oldSpeed;
         private bool inBattle = false;
+        private readonly Sprite
+            distanceSprite = Sprite.CreateUI(""),
+            speedSprite = Sprite.CreateUI("");
 
         private bool playerAlive = true, enemyTurn = false;
         public BattleMenu(GameManager gameManager, PlayerInfo playerInfo) {
+            Sprites = new Sprite[] {
+                Sprite.CreateUI("Distance: "),
+                distanceSprite,
+                Sprite.CreateUI(Environment.NewLine + "Speed: "),
+                speedSprite,
+                Sprite.CreateUI(Environment.NewLine)
+            };
+
             GameManager = gameManager;
             PlayerInfo = playerInfo;
             PlayerCharacter = PlayerInfo.Character;
@@ -28,9 +40,31 @@ namespace EsotericRogue {
                     }
                 }
             );
+            AddOption(
+                new Option() {
+                    Sprites = new Sprite[] {
+                        Sprite.CreateUI("Move")
+                    },
+                    Action = (menu, op) => {
+                        Vector2 pos = new Vector2(6, 11);
+                        string moveDis = Renderer.ReadLine(pos);
+                        Renderer.Display(Sprite.CreateEmptyUI(moveDis.Length), pos);
+                        if (int.TryParse(moveDis, out int move)) {
+                            oldDistance = distanceSprite.Display.Length;
+                            oldSpeed = speedSprite.Display.Length;
+                            PlayerCharacter.Boot.Equipped.Move(PlayerCharacter.Distance > enemyCharacter.Distance ? -move : move);
+                            UpdateDistanceSprite();
+                        }
+                    }
+                }
+            );
 
-            PlayerCharacter.WeaponEquipped += PlayerCharacter_WeaponEquipped;
-            PlayerCharacter_WeaponEquipped(PlayerCharacter, PlayerCharacter.EquippedWeapon, null);
+            PlayerCharacter.Weapon.ItemEquipped += PlayerCharacter_WeaponEquipped;
+            PlayerCharacter_WeaponEquipped(PlayerCharacter, PlayerCharacter.Weapon.Equipped, null);
+        }
+
+        private int GetDistance() {
+            return Math.Abs(PlayerCharacter.Distance - enemyCharacter.Distance);
         }
 
         private void PlayerCharacter_WeaponEquipped(Character character, Weapon weapon, Weapon oldWeapon) {
@@ -54,8 +88,23 @@ namespace EsotericRogue {
         }
 
         private void ClearWeaponOptions() {
-            if (Options.Count > 1)
-                RemoveRangeOptions(1, Options.Count - 1);
+            const int index = 2;
+            if (Options.Count > index)
+                RemoveRangeOptions(index, Options.Count - index);
+        }
+
+        private void UpdateDistanceSprite() {
+            Vector2 pos = new Vector2(Position.x + 10, Position.y);
+            Renderer.Display(Sprite.CreateEmptyUI(oldDistance), pos);
+            distanceSprite.Display = GetDistance().ToString();
+            Renderer.Display(distanceSprite, pos);
+        }
+
+        private void UpdateSpeedSprite() {
+            Vector2 pos = new Vector2(Position.x + 10, Position.y + 1);
+            Renderer.Display(Sprite.CreateEmptyUI(oldSpeed), pos);
+            speedSprite.Display = PlayerCharacter.RemainingDistance.ToString();
+            Renderer.Display(speedSprite, pos);
         }
 
         /// <summary>
@@ -124,7 +173,13 @@ namespace EsotericRogue {
             GameManager.DisplayUI();
             bool enemyAlive = true;
             character.Died += source => enemyAlive = false;
+            const int startDistance = 5;
+            PlayerCharacter.Distance = startDistance;
+            character.Distance = -startDistance;
+            UpdateDistanceSprite();
             inBattle = true;
+            PlayerCharacter.RemainingDistance = PlayerCharacter.Boot.Equipped.Speed;
+            UpdateSpeedSprite();
             while (enemyAlive) {
                 if (!playerAlive) {
                     PlayerInfo.Input.DeselectUI();
@@ -144,12 +199,17 @@ namespace EsotericRogue {
                 if (PlayerInfo.Input.SelectedUI == null)
                     PlayerInfo.Input.SelectedUIIndex = 0;
                 PlayerCharacter.Brain.Controls(character);
+                UpdateSpeedSprite();
                 if (enemyAlive && enemyTurn) {
                     enemyTurn = false;
                     PlayerCharacter.Step();
+                    character.RemainingDistance = character.Boot.Equipped.Speed;
+                    oldDistance = GetDistance();
                     character.Brain.Controls(PlayerCharacter);
                     character.Step();
+                    PlayerCharacter.RemainingDistance = PlayerCharacter.Boot.Equipped.Speed;
                     // Display
+                    UpdateDistanceSprite();
                     enemyDescriptionText.Clear();
                     playerDescriptionText.Clear();
                     enemyDescriptionText.Sprites = character.Brain.GetDescription();

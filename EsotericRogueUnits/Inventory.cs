@@ -18,10 +18,12 @@ namespace EsotericRogue {
         public delegate void AddedItemAction(Inventory inventory, Item addedItem);
         public event AddedItemAction AddedItem;
 
-        public void AddItem(Item item) {
+        public bool AddItem(Item item) {
+            if (items.Contains(item)) return false;
             item.Inventory = this;
             items.Add(item);
             AddedItem?.Invoke(this, item);
+            return true;
         }
 
         public delegate void RemovedItemAction(Inventory inventory, Item removedItem);

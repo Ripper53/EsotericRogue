@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using EsotericRogue;
+using DungeonRogue.Weapons;
+using DungeonRogue.Boots;
+using DungeonRogue.Chestplates;
+using DungeonRogue.Sleeves;
+using DungeonRogue.Pants;
 
 namespace DungeonRogue {
     public class DungeonSceneGenerator : SceneGenerator {
@@ -16,9 +21,16 @@ namespace DungeonRogue {
             int roomCount = rng.Next(MinNumberOfRoom, MaxNumberOfRoom);
             Vector2[] roomPositions = new Vector2[roomCount];
             for (int i = 0; i < roomCount; i++) {
-                Vector2 pos = new Vector2(rng.Next(Scene.Size.x), rng.Next(Scene.Size.y));
-                roomPositions[i] = pos;
-                GenerateBox(pos, new Vector2(rng.Next(MinRoomSize.x, MaxRoomSize.x), rng.Next(MinRoomSize.y, MaxRoomSize.y)));
+                Vector2
+                    pos = new Vector2(rng.Next(Scene.Size.x), rng.Next(Scene.Size.y)),
+                    size = new Vector2(rng.Next(MinRoomSize.x, MaxRoomSize.x), rng.Next(MinRoomSize.y, MaxRoomSize.y));
+                Vector2 bounds = Scene.Size - (pos + size);
+                if (bounds.x <= 0)
+                    size.x = 0;
+                if (bounds.y <= 0)
+                    size.y = 0;
+                roomPositions[i] = pos + new Vector2(size.x > 0 ? rng.Next(size.x) : 0, size.y > 0 ? rng.Next(size.y) : 0);
+                GenerateBox(pos, size);
             }
             for (int i = 1; i < roomCount; i++) {
                 GeneratePath(roomPositions[i - 1], roomPositions[i]);
@@ -92,13 +104,14 @@ namespace DungeonRogue {
                     Follow
                 }
             };
+            Weapon bareWeapon = new BareWeapon();
             AICharacterBrain characterBrain = new RandomAICharacterBrain() {
                 Weapons = new Weapon[] {
-                    new BareWeapon()
+                    bareWeapon
                 }
             };
 
-            Unit unit = new Unit(new Character(3, characterBrain, new BareWeapon()) {
+            Unit unit = new Unit(new Character(3, characterBrain, bareWeapon, new BareBoot(), new BareChestplate(), new BareSleeve(), new BarePants()) {
                 Name = "Bandit"
             }, unitBrain) {
                 Sprite = new Sprite("*")

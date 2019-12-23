@@ -13,7 +13,7 @@ namespace EsotericRogue {
             GroundSprite = new Sprite(" ");
             WallSprite = new Sprite(" ", background: ConsoleColor.Black);
             BorderSprite = WallSprite;
-            ExitSprite = new Sprite("X");
+            ExitSprite = new Sprite("O", foreground: ConsoleColor.DarkMagenta);
         }
 
         public enum Tile {

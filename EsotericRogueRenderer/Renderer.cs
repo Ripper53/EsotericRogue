@@ -119,5 +119,10 @@ namespace EsotericRogue {
             Console.CursorVisible = false;
             return inputString;
         }
+
+        public static string ReadLine(Vector2 position) {
+            Console.SetCursorPosition(position.x, position.y);
+            return ReadLine();
+        }
     }
 }

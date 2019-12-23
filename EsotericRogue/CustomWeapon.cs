@@ -18,15 +18,16 @@ namespace EsotericRogue {
 
         private class DamageAction : Action, Enchantment.IDamage {
             public int Damage { get; set; }
+            public DamageType DamageType { get; set; }
 
             public DamageAction(string description) : base(description) { }
 
-            public override void Execute(CustomWeapon source, Character targetCharacter) {
+            protected override bool Execute(CustomWeapon source, Character targetCharacter, int distance) {
                 throw new System.NotImplementedException();
             }
 
             public override IEnumerable<Sprite> GetDescription() {
-                return GetDamageDescription(Description, Damage);
+                return GetDamageDescription(Description, this, Range);
             }
         }
         private class HealAction : Action, Enchantment.IHeal {
@@ -34,7 +35,7 @@ namespace EsotericRogue {
 
             public HealAction(string description) : base(description) { }
 
-            public override void Execute(CustomWeapon source, Character targetCharacter) {
+            protected override bool Execute(CustomWeapon source, Character targetCharacter, int distance) {
                 throw new System.NotImplementedException();
             }
 
@@ -44,11 +45,12 @@ namespace EsotericRogue {
         }
         private class DamageHealAction : Action, Enchantment.IDamage, Enchantment.IHeal {
             public int Damage { get; set; }
+            public DamageType DamageType { get; set; }
             public int Heal { get; set; }
 
             public DamageHealAction(string description) : base(description) { }
 
-            public override void Execute(CustomWeapon source, Character targetCharacter) {
+            protected override bool Execute(CustomWeapon source, Character targetCharacter, int distance) {
                 throw new System.NotImplementedException();
             }
 

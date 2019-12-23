@@ -1,17 +1,20 @@
 ﻿using System;
 using EsotericRogue;
+using DungeonRogue.Weapons;
+using DungeonRogue.Boots;
+using DungeonRogue.Chestplates;
+using DungeonRogue.Sleeves;
+using DungeonRogue.Pants;
 
 namespace DungeonRogue {
     public class DungeonGameManager : GameManager {
         public bool QuitGame { get; private set; }
 
         public DungeonGameManager() : base(
-            new Unit(new Character(10, new PlayerCharacterBrain(), new BareWeapon()), new PlayerUnitBrain()) {
+            new Unit(new Character(10, new PlayerCharacterBrain(), new BareWeapon(), new BareBoot(), new BareChestplate(), new BareSleeve(), new BarePants()), new PlayerUnitBrain()) {
                 Sprite = new Sprite("@", ConsoleColor.Magenta)
             }
-        ) {
-        
-        }
+        ) { }
 
         protected override bool Start() {
             // Set up

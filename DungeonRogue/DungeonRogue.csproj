@@ -9,4 +9,8 @@
     <ProjectReference Include="..\EsotericRogue\EsotericRogue.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Potions\" />
+  </ItemGroup>
+
 </Project>

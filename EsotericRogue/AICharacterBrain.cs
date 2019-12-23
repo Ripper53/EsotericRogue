@@ -10,6 +10,7 @@ namespace EsotericRogue {
         private IEnumerable<Sprite> usedWeaponDescription;
         public void UseWeapon(int index, int weaponIndex, Character enemyCharacter) {
             Weapon weapon = Weapons[index];
+            Character.Weapon.Equipped = weapon;
             weapon.Use(weaponIndex, enemyCharacter);
             usedWeaponDescription = weapon[weaponIndex].GetDescription();
         }

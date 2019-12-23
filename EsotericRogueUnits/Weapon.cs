@@ -3,30 +3,45 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace EsotericRogue {
-    public abstract class Weapon : Item, IReadOnlyList<Weapon.Action> {
+    public abstract class Weapon : EquippableItem, IReadOnlyList<Weapon.Action> {
         public override bool Consumable => false;
 
+        public static ConsoleColor GetDamageColor(DamageType damageType) {
+            switch (damageType) {
+                case DamageType.Physical:
+                    return Character.StaminaSprite.Foreground;
+                case DamageType.Magical:
+                    return Character.ManaSprite.Foreground;
+                case DamageType.Electrical:
+                    return Character.EnergySprite.Foreground;
+                default:
+                    return ConsoleColor.White;
+            }
+        }
+
         public abstract class Action {
+            public int Range = 10;
             public abstract IEnumerable<Sprite> GetDescription();
 
-            public static Sprite[] GetDamageDescription(string attackDescription, int damage) {
+            public static Sprite[] GetDamageDescription(string attackDescription, Enchantment.IDamage damage, int range) {
                 return new Sprite[] {
                     Sprite.CreateUI(attackDescription + " for "),
-                    new Sprite(damage.ToString(), ConsoleColor.Red, ConsoleColor.Black),
-                    Sprite.CreateUI(" damage.")
+                    new Sprite(damage.Damage.ToString(), GetDamageColor(damage.DamageType), ConsoleColor.Black),
+                    Sprite.CreateUI(" damage."),
+                    Sprite.CreateUI($" [Range: {range}]")
                 };
             }
         }
         protected abstract IList<Action> Actions { get; }
         public int Count => Actions.Count;
-        public Character Character { get; internal set; }
         public Action this[int index] => Actions[index];
 
-        protected override void UseAction(Character character) {
-            character.EquippedWeapon = this;
+        protected override bool UseAction(Character character) {
+            character.Weapon.Equipped = this;
+            return true;
         }
 
-        public abstract void Use(int index, Character targetCharacter);
+        public abstract bool Use(int index, Character targetCharacter);
 
         public IEnumerator<Action> GetEnumerator() {
             return (IEnumerator<Action>)Actions;
@@ -39,11 +54,16 @@ namespace EsotericRogue {
     public abstract class Weapon<T> : Weapon where T : Weapon<T> {
         public abstract new class Action : Weapon.Action {
 
-            public abstract void Execute(T source, Character targetCharacter);
+            public bool Do(T source, Character targetCharacter, int distance) {
+                if (distance > Range)
+                    return false;
+                return Execute(source, targetCharacter, distance);
+            }
+            protected abstract bool Execute(T source, Character targetCharacter, int distance);
         }
 
-        public override void Use(int index, Character targetCharacter) {
-            ((Action)Actions[index]).Execute((T)this, targetCharacter);
+        public override bool Use(int index, Character targetCharacter) {
+            return ((Action)Actions[index]).Do((T)this, targetCharacter, Math.Abs(Character.Distance - targetCharacter.Distance));
         }
     }
 }

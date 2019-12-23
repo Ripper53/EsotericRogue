@@ -7,14 +7,14 @@ namespace EsotericRogue {
         public IEnumerable<Sprite> Sprites;
         public int Width = 10;
 
+        private int widthCount;
         private string WordWrap(string text) {
             string[] lines = text.Split(Environment.NewLine);
             int resultCount = 0;
             for (int i = 0; i < lines.Length; i++) {
                 string line = lines[i];
-                string[] words = line.Split(' ');
+                string[] words = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 StringBuilder stringBuilder = new StringBuilder(text.Length + words.Length);
-                int widthCount = 0;
                 foreach (string word in words) {
                     stringBuilder.Append(word);
                     stringBuilder.Append(' ');
@@ -35,12 +35,9 @@ namespace EsotericRogue {
 
         protected override void DisplayUI() {
             if (Sprites != null) {
+                widthCount = 0;
                 foreach (Sprite sprite in Sprites) {
-                    if (sprite.Display.Length > Width) {
-                        Renderer.Add(new Sprite(WordWrap(sprite.Display), sprite.Foreground, sprite.Background));
-                    } else {
-                        Renderer.Add(sprite);
-                    }
+                    Renderer.Add(new Sprite(WordWrap(sprite.Display), sprite.Foreground, sprite.Background));
                 }
             }
         }

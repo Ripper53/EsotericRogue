@@ -29,8 +29,7 @@
         protected void GenerateBox(Vector2 start, Vector2 size) {
             for (int y = 0, startX = start.x; y < size.y; y++, start.y++, start.x = startX) {
                 for (int x = 0; x < size.x; x++, start.x++) {
-                    if (Scene.InBounds(start))
-                        Scene.SetTile(Scene.Tile.Ground, start);
+                    Scene.SetTile(Scene.Tile.Ground, start);
                 }
             }
         }

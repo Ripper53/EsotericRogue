@@ -61,15 +61,15 @@ namespace EsotericRogue {
             return text.Replace(Environment.NewLine, string.Empty).Length;
         }
 
-        protected Vector2 DisplayPosition { get; private set; }
-        private readonly List<Sprite> displaySprites = new List<Sprite>();
+        protected Vector2 ClearPosition { get; private set; }
+        private readonly List<Sprite> clearSprites = new List<Sprite>();
 
         public void Display() {
             DisplayUI();
             // Clear display prep
-            DisplayPosition = Position;
-            displaySprites.Clear();
-            displaySprites.Capacity = Renderer.Sprites.Count;
+            ClearPosition = Position;
+            clearSprites.Clear();
+            clearSprites.Capacity = Renderer.Sprites.Count;
             StringBuilder stringBuilder = new StringBuilder();
             foreach (Sprite sprite in Renderer.Sprites) {
                 stringBuilder.Clear();
@@ -84,7 +84,7 @@ namespace EsotericRogue {
                 // There should be no new line at the end of the last line.
                 for (int i = 0, c = lines[count].Length; i < c; i++)
                     stringBuilder.Append(' ');
-                displaySprites.Add(Sprite.CreateUI(stringBuilder.ToString()));
+                clearSprites.Add(Sprite.CreateUI(stringBuilder.ToString()));
             }
             // Display UI
             Renderer.Display(Position);
@@ -92,9 +92,9 @@ namespace EsotericRogue {
         protected abstract void DisplayUI();
 
         public virtual void Clear() {
-            foreach (Sprite sprite in displaySprites)
+            foreach (Sprite sprite in clearSprites)
                 Renderer.Add(sprite);
-            Renderer.Display(DisplayPosition);
+            Renderer.Display(ClearPosition);
         }
     }
 }

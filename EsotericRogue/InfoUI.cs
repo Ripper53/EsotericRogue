@@ -18,14 +18,14 @@ namespace EsotericRogue {
                 Character.Stamina.ValueChanged += Stamina_ValueChanged;
                 Character.Mana.ValueChanged += Mana_ValueChanged;
                 Character.Energy.ValueChanged += Energy_ValueChanged;
-                Character.WeaponEquipped += Character_WeaponEquipped;
+                Character.Weapon.ItemEquipped += Character_WeaponEquipped;
             };
             Deactivated += source => {
                 Character.HealthChanged -= Character_HealthChanged;
                 Character.Stamina.ValueChanged -= Stamina_ValueChanged;
                 Character.Mana.ValueChanged -= Mana_ValueChanged;
                 Character.Energy.ValueChanged -= Energy_ValueChanged;
-                Character.WeaponEquipped -= Character_WeaponEquipped;
+                Character.Weapon.ItemEquipped -= Character_WeaponEquipped;
             };
         }
 
@@ -97,16 +97,16 @@ namespace EsotericRogue {
             Stamina_ValueChanged(Character.Stamina, Character.Stamina.Value);
             Mana_ValueChanged(Character.Mana, Character.Mana.Value);
             Energy_ValueChanged(Character.Energy, Character.Energy.Value);
-            Character_WeaponEquipped(Character, Character.EquippedWeapon, Character.EquippedWeapon);
+            Character_WeaponEquipped(Character, Character.Weapon.Equipped, Character.Weapon.Equipped);
         }
 
         public override void Clear() {
             base.Clear();
-            Renderer.Display(Sprite.CreateEmptyUI(GetHealthSprite(Character).Display.Length), GetHealthPosition(DisplayPosition));
-            Renderer.Display(Sprite.CreateEmptyUI(GetSprite(Character.Stamina).Display.Length), GetStaminaPosition(DisplayPosition));
-            Renderer.Display(Sprite.CreateEmptyUI(GetSprite(Character.Mana).Display.Length), GetManaPosition(DisplayPosition));
-            Renderer.Display(Sprite.CreateEmptyUI(GetSprite(Character.Energy).Display.Length), GetEnergyPosition(DisplayPosition));
-            Renderer.Display(Sprite.CreateEmptyUI(GetWeaponName(Character.EquippedWeapon).Length), GetWeaponEquippedPosition(DisplayPosition));
+            Renderer.Display(Sprite.CreateEmptyUI(GetHealthSprite(Character).Display.Length), GetHealthPosition(ClearPosition));
+            Renderer.Display(Sprite.CreateEmptyUI(GetSprite(Character.Stamina).Display.Length), GetStaminaPosition(ClearPosition));
+            Renderer.Display(Sprite.CreateEmptyUI(GetSprite(Character.Mana).Display.Length), GetManaPosition(ClearPosition));
+            Renderer.Display(Sprite.CreateEmptyUI(GetSprite(Character.Energy).Display.Length), GetEnergyPosition(ClearPosition));
+            Renderer.Display(Sprite.CreateEmptyUI(GetWeaponName(Character.Weapon.Equipped).Length), GetWeaponEquippedPosition(ClearPosition));
         }
     }
 }

@@ -25,6 +25,7 @@ namespace EsotericRogue {
 
         public interface IDamage {
             int Damage { get; set; }
+            DamageType DamageType { get; set; }
         }
         public interface IHeal {
             int Heal { get; set; }
