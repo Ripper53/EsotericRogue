@@ -76,6 +76,7 @@ namespace EsotericRogue {
         private readonly Queue<Character> toBattle = new Queue<Character>();
         public void Battle(UnitBrain brain) {
             Scene.DestroyUnit(brain.Unit);
+            Scene.DisplayTile(brain.Unit.Position);
             toBattle.Enqueue(brain.Unit.Character);
         }
 

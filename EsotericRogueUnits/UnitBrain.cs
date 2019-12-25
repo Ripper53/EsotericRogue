@@ -11,10 +11,18 @@
 
         public bool Move(Vector2 position) {
             if (Scene.InBounds(position) && CanMove(position)) {
-                Scene.MoveUnit(Unit, position);
+                ExecuteMoveUnitToPosition(position);
                 return true;
             }
             return false;
+        }
+
+        private void ExecuteMoveUnitToPosition(Vector2 position) {
+            Unit unit = Scene.GetUnit(position);
+            if (unit != null && unit.Brain is IBattleUnitBrain p)
+                p.Battle(this);
+            else
+                Scene.MoveUnit(Unit, position);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace EsotericRogue {
-    public class PlayerUnitBrain : UnitBrain {
+    public class PlayerUnitBrain : UnitBrain, IBattleUnitBrain {
         public PlayerInput PlayerInput { get; internal set; }
         public bool ValidInput { get; private set; }
 
@@ -10,6 +10,10 @@ namespace EsotericRogue {
 
         public bool CanView(Vector2 position) => viewBrain.Contains(position);
         public void UpdateView() => viewBrain.Update(Scene, Unit.Position);
+
+        public void Battle(UnitBrain unitBrain) {
+            PlayerInput.GameManager.Battle(unitBrain);
+        }
 
         public override void Controls() {
             switch (PlayerInput.GetInput().Key) {
