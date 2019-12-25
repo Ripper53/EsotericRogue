@@ -105,6 +105,7 @@ namespace EsotericRogue {
                                     Generate();
                                 } else {
                                     // If Player moved to free spot.
+                                    brain.UpdateView();
                                     foreach (Unit unit in new List<Unit>(Scene.Units)) {
                                         // If Unit has a brain and it is not the Player's brain, execute controls.
                                         if (unit.Brain != null && unit.Brain != brain)
@@ -112,9 +113,13 @@ namespace EsotericRogue {
                                     }
                                     // Display any units in view!
                                     foreach (Unit unit in Scene.Units) {
-                                        if (brain.ViewPositions.Contains(unit.PreviousPosition))
+                                        // Display tile in previous position.
+                                        if (brain.CanView(unit.PreviousPosition))
                                             Scene.DisplayTile(unit.PreviousPosition);
-                                        if (brain.ViewPositions.Contains(unit.Position))
+                                    }
+                                    foreach (Unit unit in Scene.Units) {
+                                        // Display unit in moved position.
+                                        if (brain.CanView(unit.Position))
                                             Scene.DisplayUnit(unit.Position);
                                     }
                                 }

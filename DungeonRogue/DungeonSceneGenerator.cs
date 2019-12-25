@@ -134,7 +134,7 @@ namespace DungeonRogue {
                 else
                     return source.Move(source.Unit.UpPosition);
             }
-            if (Math.Abs(dir.x) > Math.Abs(dir.y)) {
+            if (MathF.Abs(dir.x) > MathF.Abs(dir.y)) {
                 if (!moveX())
                     moveY();
             } else {

@@ -12,7 +12,7 @@ namespace EsotericRogue {
 
         static Scene() {
             GroundSprite = new Sprite(" ");
-            WallSprite = new Sprite(" ", background: ConsoleColor.Black);
+            WallSprite = new Sprite(" ", background: ConsoleColor.DarkGray);
             BorderSprite = WallSprite;
             ExitSprite = new Sprite("O", foreground: ConsoleColor.DarkMagenta);
             FogSprite = new Sprite(" ", background: ConsoleColor.Black);
@@ -94,7 +94,7 @@ namespace EsotericRogue {
         public void DestroyUnit(Unit unit) {
             if (units.Remove(unit)) {
                 unitsMap[unit.Position.x, unit.Position.y] = null;
-                DisplayTile(unit.Position);
+                //DisplayTile(unit.Position);
             }
         }
 
