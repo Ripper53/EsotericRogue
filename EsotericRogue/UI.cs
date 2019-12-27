@@ -26,7 +26,7 @@ namespace EsotericRogue {
         public Vector2 Position;
 
         public static string GetContinuedString(string text, int maxLength) {
-            StringBuilder stringBuilder = new StringBuilder(text, text.Length + Environment.NewLine.Length);
+            StringBuilder stringBuilder = new StringBuilder(text, text.Length + ContinuedString.Length);
             if (stringBuilder.Length > maxLength) {
                 string n = stringBuilder.ToString(0, maxLength - 1);
                 stringBuilder.Clear();

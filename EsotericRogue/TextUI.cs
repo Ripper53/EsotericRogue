@@ -6,6 +6,7 @@ namespace EsotericRogue {
     public class TextUI : UI {
         public IEnumerable<Sprite> Sprites;
         public int Width = 10;
+        public int MaxLength = 100;
 
         private int widthCount;
         private string WordWrap(string text) {
@@ -36,8 +37,17 @@ namespace EsotericRogue {
         protected override void DisplayUI() {
             if (Sprites != null) {
                 widthCount = 0;
+                int characterCount = 0;
                 foreach (Sprite sprite in Sprites) {
-                    Renderer.Add(new Sprite(WordWrap(sprite.Display), sprite.Foreground, sprite.Background));
+                    Sprite wrappedSprite = new Sprite(WordWrap(sprite.Display), sprite.Foreground, sprite.Background);
+                    int thisCharacterCount = wrappedSprite.Display.Length;
+                    characterCount += thisCharacterCount;
+                    if (characterCount > MaxLength) {
+                        wrappedSprite.Display = GetContinuedString(wrappedSprite.Display, thisCharacterCount - (characterCount - MaxLength));
+                        Renderer.Add(wrappedSprite);
+                        return;
+                    }
+                    Renderer.Add(wrappedSprite);
                 }
             }
         }

@@ -73,6 +73,10 @@ namespace EsotericRogue {
             }
             foreach (Enchantment enchantment in toRemove)
                 enchantments.Remove(enchantment.Name);
+
+            Stamina.Step();
+            Mana.Step();
+            Energy.Step();
         }
 
         private void Check() {

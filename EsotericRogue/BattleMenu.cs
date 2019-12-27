@@ -119,19 +119,21 @@ namespace EsotericRogue {
 
             TextUI vsText = new TextUI() {
                 Sprites = new Sprite[] {
-                    new Sprite("vs", ConsoleColor.White, ConsoleColor.Black)
+                    Sprite.CreateUI(" vs ")
                 },
-                Position = new Vector2(18, 0)
+                Position = new Vector2(PlayerInfo.InfoUI.MaxWidth + 1, 0)
             };
             GameManager.AddUI(vsText);
 
-            const int playerDescriptionPosX = 70, enemyDescriptionPosX = 40;
+            int playerDescriptionPosX = PlayerInfo.InfoUI.MaxWidth + 55, enemyDescriptionPosX = playerDescriptionPosX - 30;
+            const int descriptionWidth = 20, descriptionMaxLength = 100;
             TextUI playerNameDescriptionText = new TextUI() {
                 Sprites = new Sprite[] {
                     new Sprite(GetContinuedString(PlayerCharacter.Name, 12) + " Actions:")
                 },
                 Position = new Vector2(playerDescriptionPosX, 0),
-                Width = 20
+                Width = descriptionWidth,
+                MaxLength = descriptionMaxLength
             };
             GameManager.AddUI(playerNameDescriptionText);
 
@@ -140,25 +142,28 @@ namespace EsotericRogue {
                     new Sprite(GetContinuedString(character.Name, 12) + " Actions:")
                 },
                 Position = new Vector2(enemyDescriptionPosX, 0),
-                Width = 20
+                Width = descriptionWidth,
+                MaxLength = descriptionMaxLength
             };
             GameManager.AddUI(enemyNameDescriptionText);
 
             TextUI playerDescriptionText = new TextUI() {
                 Position = new Vector2(playerDescriptionPosX, 1),
-                Width = 20
+                Width = descriptionWidth,
+                MaxLength = descriptionMaxLength
             };
             GameManager.AddUI(playerDescriptionText);
 
             TextUI enemyDescriptionText = new TextUI() {
                 Position = new Vector2(enemyDescriptionPosX, 1),
-                Width = 20
+                Width = descriptionWidth,
+                MaxLength = descriptionMaxLength
             };
             GameManager.AddUI(enemyDescriptionText);
 
 
             InfoUI enemyInfo = new InfoUI(character) {
-                Position = new Vector2(21, 0)
+                Position = new Vector2(PlayerInfo.InfoUI.MaxWidth + 4, 0)
             };
             GameManager.AddUI(enemyInfo);
 

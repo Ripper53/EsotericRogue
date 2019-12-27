@@ -13,6 +13,7 @@
 
         public int Value { get; private set; }
         public int Max { get; private set; }
+        public int Regen { get; set; }
 
         public Resource() {
             Value = 0;
@@ -36,6 +37,10 @@
 
         public delegate void AddedAction(Resource resource, int addedAmount);
         public event AddedAction Added;
+
+        internal void Step() {
+            Add(Regen);
+        }
 
         public void Add(int amount) {
             int oldValue = Value;

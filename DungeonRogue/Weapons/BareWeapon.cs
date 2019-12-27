@@ -10,8 +10,14 @@ namespace DungeonRogue.Weapons {
         protected override IList<Weapon.Action> Actions => actions;
 
         private class PunchAction : Action, Enchantment.IDamage {
-            public int Damage { get; set; } = 1;
-            public DamageType DamageType { get; set; } = DamageType.Physical;
+            public int Damage { get; set; }
+            public DamageType DamageType { get; set; }
+
+            public PunchAction() {
+                Damage = 1;
+                DamageType = DamageType.Physical;
+                Range = 2;
+            }
 
             public override IEnumerable<Sprite> GetDescription() {
                 return GetDamageDescription("Punch", this, Range);

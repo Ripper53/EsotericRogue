@@ -14,7 +14,10 @@ namespace DungeonRogue {
             new Unit(new Character(10, new PlayerCharacterBrain(), new BareWeapon(), new BareBoot(), new BareChestplate(), new BareSleeve(), new BarePants()), new PlayerUnitBrain()) {
                 Sprite = new Sprite("@", ConsoleColor.Magenta)
             }
-        ) { }
+        ) {
+            PlayerInfo.Character.Stamina.IncreaseMax(5);
+            PlayerInfo.Character.Stamina.Regen = 1;
+        }
 
         protected override bool Start() {
             // Set up
