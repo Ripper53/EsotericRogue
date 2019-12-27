@@ -4,7 +4,9 @@ using EsotericRogue;
 namespace DungeonRogue.Weapons {
     public class BareWeapon : Weapon<BareWeapon> {
         public override string Name => "Bare";
-        private readonly Action[] actions = new Action[] { new PunchAction() };
+        private readonly Action[] actions = new Action[] {
+            new PunchAction()
+        };
         protected override IList<Weapon.Action> Actions => actions;
 
         private class PunchAction : Action, Enchantment.IDamage {

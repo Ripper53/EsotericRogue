@@ -1,5 +1,5 @@
 ﻿namespace EsotericRogue {
-    public abstract class ProtectiveItem : EquippableItem {
+    public abstract class ProtectiveItem : EquippableItem, Enchantment.IPhysicalDefense, Enchantment.IMagicalDefense, Enchantment.IElectricalDefense {
         public override bool Consumable => false;
 
         public int PhysicalDefense { get; set; }

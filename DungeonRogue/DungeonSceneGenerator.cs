@@ -104,7 +104,7 @@ namespace DungeonRogue {
                     Follow
                 }
             };
-            Weapon bareWeapon = new BareWeapon();
+            Weapon bareWeapon = new SteelSwordWeapon();
             AICharacterBrain characterBrain = new RandomAICharacterBrain() {
                 Weapons = new Weapon[] {
                     bareWeapon

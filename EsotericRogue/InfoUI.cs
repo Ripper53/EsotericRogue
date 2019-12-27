@@ -9,6 +9,8 @@ namespace EsotericRogue {
         public readonly Character Character;
         public int OffsetY;
 
+        private const int maxWidth = 20;
+
         public InfoUI(Character character) {
             NameSprite = new Sprite(character.Name);
             Character = character;
@@ -48,7 +50,7 @@ namespace EsotericRogue {
             Renderer.Display(GetSprite(resource), GetEnergyPosition(Position));
         }
         private Vector2 GetWeaponEquippedPosition(Vector2 position) => position + new Vector2(8, OffsetY + 5);
-        private string GetWeaponName(Weapon weapon) => GetContinuedString(weapon.Name.PadRight(lastWeaponName.Length), 12);
+        private string GetWeaponName(Weapon weapon) => GetContinuedString(weapon.Name.PadRight(lastWeaponName.Length), maxWidth - 8);
         private string lastWeaponName = string.Empty;
         private void Character_WeaponEquipped(Character character, Weapon weapon, Weapon oldWeapon) {
             lastWeaponName = GetWeaponName(weapon);
@@ -74,8 +76,7 @@ namespace EsotericRogue {
         }
 
         protected override void DisplayUI() {
-            const int maxLength = 17;
-            NameSprite.Display = GetStringPadRight(GetContinuedString(Character.Name, maxLength), maxLength) + Environment.NewLine;
+            NameSprite.Display = GetStringPadRight(GetContinuedString(Character.Name, maxWidth), maxWidth) + Environment.NewLine;
             Renderer.Add(NameSprite);
             if (Sprites != null) {
                 foreach (Sprite s in Sprites)

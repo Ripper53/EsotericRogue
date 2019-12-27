@@ -42,6 +42,10 @@ namespace EsotericRogue {
             options.Add(option);
         }
 
+        public void SetOption(Option option, int index) {
+            options[index] = option;
+        }
+
         public void RemoveOption(Option option) {
             options.Remove(option);
             if (SelectedOptionIndex == options.Count)

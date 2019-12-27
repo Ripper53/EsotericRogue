@@ -30,5 +30,26 @@ namespace EsotericRogue {
         public interface IHeal {
             int Heal { get; set; }
         }
+
+        public interface IStaminaCost {
+            int StaminaCost { get; set; }
+        }
+        public interface IManaCost {
+            int ManaCost { get; set; }
+        }
+        public interface IEnergyCost {
+            int EnergyCost { get; set; }
+        }
+
+        public interface IPhysicalDefense {
+            int PhysicalDefense { get; set; }
+        }
+        public interface IMagicalDefense {
+            int MagicalDefense { get; set; }
+        }
+        public interface IElectricalDefense {
+            int ElectricalDefense { get; set; }
+        }
+
     }
 }

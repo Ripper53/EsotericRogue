@@ -20,14 +20,26 @@ namespace EsotericRogue {
         }
 
         public abstract class Action {
-            public int Range = 10;
+            public int Range = 1;
             public abstract IEnumerable<Sprite> GetDescription();
 
-            public static Sprite[] GetDamageDescription(string attackDescription, Enchantment.IDamage damage, int range) {
+            public static Sprite[] GetDamageDescription(string attackDescription, Enchantment.IDamage enchantment, int range) {
                 return new Sprite[] {
                     Sprite.CreateUI(attackDescription + " for "),
-                    new Sprite(damage.Damage.ToString(), GetDamageColor(damage.DamageType), ConsoleColor.Black),
+                    new Sprite(enchantment.Damage.ToString(), GetDamageColor(enchantment.DamageType), ConsoleColor.Black),
                     Sprite.CreateUI(" damage."),
+                    Sprite.CreateUI($" [Range: {range}]")
+                };
+            }
+
+            public static Sprite[] GetDamageDescription<T>(string attackDescription, T enchantment, int range) where T : Enchantment.IDamage, Enchantment.IStaminaCost {
+                return new Sprite[] {
+                    Sprite.CreateUI(attackDescription + " for "),
+                    new Sprite(enchantment.Damage.ToString(), GetDamageColor(enchantment.DamageType), ConsoleColor.Black),
+                    Sprite.CreateUI(" damage, "),
+                    Sprite.CreateUI(" costs "),
+                    new Sprite(enchantment.StaminaCost.ToString(), GetDamageColor(DamageType.Physical), ConsoleColor.Black),
+                    Sprite.CreateUI(" stamina."),
                     Sprite.CreateUI($" [Range: {range}]")
                 };
             }

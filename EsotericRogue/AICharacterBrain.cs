@@ -11,8 +11,12 @@ namespace EsotericRogue {
         public void UseWeapon(int index, int weaponIndex, Character enemyCharacter) {
             Weapon weapon = Weapons[index];
             Character.Weapon.Equipped = weapon;
-            weapon.Use(weaponIndex, enemyCharacter);
-            usedWeaponDescription = weapon[weaponIndex].GetDescription();
+            if (weapon.Use(weaponIndex, enemyCharacter))
+                usedWeaponDescription = weapon[weaponIndex].GetDescription();
+            else
+                usedWeaponDescription = new Sprite[] {
+                   Sprite.CreateUI("Failed action!")
+                };
         }
 
         public override IEnumerable<Sprite> GetDescription() {

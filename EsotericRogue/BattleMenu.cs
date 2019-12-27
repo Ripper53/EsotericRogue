@@ -75,9 +75,10 @@ namespace EsotericRogue {
                 AddOption(new Option() {
                     Sprites = action.GetDescription(),
                     Action = (menu, op) => {
-                        weapon.Use(index, enemyCharacter);
-                        PlayerInfo.CharacterBrain.Description = weapon[index].GetDescription();
-                        enemyTurn = true;
+                        if (weapon.Use(index, enemyCharacter)) {
+                            PlayerInfo.CharacterBrain.Description = weapon[index].GetDescription();
+                            enemyTurn = true;
+                        }
                     }
                 });
             }
@@ -173,7 +174,7 @@ namespace EsotericRogue {
             GameManager.DisplayUI();
             bool enemyAlive = true;
             character.Died += source => enemyAlive = false;
-            const int startDistance = 5;
+            const int startDistance = 1;
             PlayerCharacter.Distance = startDistance;
             character.Distance = -startDistance;
             UpdateDistanceSprite();
@@ -188,7 +189,7 @@ namespace EsotericRogue {
                     GameManager.DisplayUI();
                     Renderer.Display(
                         Sprite.CreateUI($"Game Over!{Environment.NewLine}Enter 'E' to continue...{Environment.NewLine}"),
-                        new Vector2(0, 7)
+                        new Vector2(0, 8)
                     );
                     string exitCode;
                     do {
@@ -222,7 +223,9 @@ namespace EsotericRogue {
 
             // Drop
             PlayerCharacter.Inventory.Gold += character.Inventory.Gold;
-
+            foreach (Item item in character.Inventory) {
+                PlayerCharacter.Inventory.AddItem(item);
+            }
 
             // Clean up
             GameManager.RemoveUI(this);

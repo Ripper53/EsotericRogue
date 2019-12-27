@@ -57,7 +57,7 @@
         }
 
         public bool Use(int amount) {
-            if (Value > amount) return false;
+            if (amount > Value) return false;
             Remove(amount);
             return true;
         }
