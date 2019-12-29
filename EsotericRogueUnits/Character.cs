@@ -15,7 +15,7 @@ namespace EsotericRogue {
             ManaSprite = new Sprite("Mana", ConsoleColor.Blue, ConsoleColor.Black),
             EnergySprite = new Sprite("Energy", ConsoleColor.Yellow, ConsoleColor.Black);
 
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
         public int Distance = 0, RemainingDistance = 0;
 
         public int Health { get; private set; }
@@ -74,6 +74,9 @@ namespace EsotericRogue {
             foreach (Enchantment enchantment in toRemove)
                 enchantments.Remove(enchantment.Name);
 
+            ResourceStep();
+        }
+        public void ResourceStep() {
             Stamina.Step();
             Mana.Step();
             Energy.Step();

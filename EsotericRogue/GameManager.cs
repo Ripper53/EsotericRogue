@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EsotericRogue {
     public abstract class GameManager {
@@ -107,7 +108,16 @@ namespace EsotericRogue {
                                 } else {
                                     // If Player moved to free spot.
                                     brain.UpdateView();
-                                    foreach (Unit unit in new List<Unit>(Scene.Units)) {
+                                    List<Unit> allUnits = new List<Unit>(Scene.Units);
+                                    List<Task> tasks = new List<Task>(allUnits.Count);
+                                    foreach (Unit unit in allUnits) {
+                                        if (unit.Brain is AIUnitBrain aiBrain) {
+                                            tasks.Add(Task.Run(() => aiBrain.PreCalculate(this)));
+                                        }
+                                    }
+                                    Task.WaitAll(tasks.ToArray());
+                                    foreach (Unit unit in allUnits) {
+                                        unit.Character.ResourceStep();
                                         // If Unit has a brain and it is not the Player's brain, execute controls.
                                         if (unit.Brain != null && unit.Brain != brain)
                                             unit.Brain.Controls();

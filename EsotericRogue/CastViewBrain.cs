@@ -3,17 +3,26 @@
 namespace EsotericRogue {
     public class CastViewBrain : ViewBrain {
 
-        protected override void UpdatePositions(HashSet<Vector2> positions, Scene scene, Vector2 origin) {
+        #region Static
+        public static void CastView<T>(T ai, int obstacleCount) where T : AIUnitBrain, AIUnitBrain.IView {
+            ai.View = new HashSet<Vector2>();
+            CastView(ai.View, ai.Scene, ai.Unit.Position, obstacleCount);
+        }
+
+        private static void CastView(HashSet<Vector2> positions, Scene scene, Vector2 origin, int obstacleCount) {
             // Remember positive is down!
 
             bool CanSee(Vector2 position) => scene.GetTile(position) != Scene.Tile.Wall;
 
             int CanSeeCast(Vector2 origin, Vector2 add, int maxCount) {
-                for (int i = 0; i < maxCount && scene.InBounds(origin); i++) {
-                    positions.Add(origin);
+                for (int i = 0, obstacleI = 0; i < maxCount && scene.InBounds(origin); i++) {
                     // Can see after because we should be able to see the first wall hit!
-                    if (!CanSee(origin))
-                        return i + 1;
+                    if (!CanSee(origin)) {
+                        obstacleI++;
+                        if (obstacleI > obstacleCount)
+                            return i + 1;
+                    }
+                    positions.Add(origin);
                     origin += add;
                 }
                 return maxCount;
@@ -46,6 +55,17 @@ namespace EsotericRogue {
             UpdateViewCast(new Vector2(0, -1), new Vector2(1, 0));
             // (go up, cast left)
             UpdateViewCast(new Vector2(0, -1), new Vector2(-1, 0));
+        }
+        #endregion
+
+        protected override void UpdatePositions(HashSet<Vector2> positions, Scene scene, Vector2 origin) {
+            CastView(positions, scene, origin, 1);
+
+            // DELETE CODE BELOW, ONLY USED WHEN DEBUGGING!
+            for (int y = 0; y < scene.Size.y; y++) {
+                for (int x = 0; x < scene.Size.x; x++)
+                    positions.Add(new Vector2(x, y));
+            }
         }
 
     }

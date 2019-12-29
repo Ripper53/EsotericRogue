@@ -27,6 +27,8 @@ namespace EsotericRogue {
         private Tile[,] tilesMap;
         private readonly HashSet<Unit> units = new HashSet<Unit>();
         public IReadOnlyCollection<Unit> Units => units;
+        private readonly List<Vector2> groundPositions = new List<Vector2>();
+        public IReadOnlyList<Vector2> GroundPositions => groundPositions;
 
         public Unit GetUnit(Vector2 position) => unitsMap[position.x, position.y];
         public Tile GetTile(Vector2 position) => tilesMap[position.x, position.y];
@@ -37,7 +39,19 @@ namespace EsotericRogue {
             units.Add(unit);
             //Renderer.Display(unit.Sprite, position + new Vector2(1, 1)); ? Don't display unit since it might be in fog!
         }
-        public void SetTile(Tile tile, Vector2 position) => tilesMap[position.x, position.y] = tile;
+        public void SetTile(Tile tile, Vector2 position) {
+            switch (tilesMap[position.x, position.y]) {
+                case Tile.Ground:
+                    groundPositions.Add(position);
+                    break;
+            }
+            tilesMap[position.x, position.y] = tile;
+            switch (tile) {
+                case Tile.Ground:
+                    groundPositions.Add(position);
+                    break;
+            }
+        }
 
         public void SetSize(Vector2 size) {
             Size = size;

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using EsotericRogue;
-using DungeonRogue.Weapons;
-using DungeonRogue.Boots;
-using DungeonRogue.Chestplates;
-using DungeonRogue.Sleeves;
-using DungeonRogue.Pants;
+using DungeonRogue.Units;
 
 namespace DungeonRogue {
     public class DungeonSceneGenerator : SceneGenerator {
@@ -89,64 +85,19 @@ namespace DungeonRogue {
                 }
             }
 
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 10; i++) {
                 Vector2? pos = GetRandomGroundPosition();
                 if (pos.HasValue)
-                    SpawnBandit(pos.Value);
+                    Spawn(pos.Value);
                 else
                     break;
             }
         }
 
-        private void SpawnBandit(Vector2 position) {
-            AIUnitBrain unitBrain = new AIUnitBrain() {
-                ControlsActions = new AIUnitBrain.ControlsAction[] {
-                    Follow
-                }
-            };
-            Weapon bareWeapon = new SteelSwordWeapon();
-            AICharacterBrain characterBrain = new RandomAICharacterBrain() {
-                Weapons = new Weapon[] {
-                    bareWeapon
-                }
-            };
-
-            Unit unit = new Unit(new Character(3, characterBrain, bareWeapon, new BareBoot(), new BareChestplate(), new BareSleeve(), new BarePants()) {
-                Name = "Bandit"
-            }, unitBrain) {
-                Sprite = new Sprite("*")
-            };
-            Scene.SetUnit(unit, position);
+        #region Spawns
+        private void Spawn(Vector2 position) {
+            Scene.SetUnit(new BanditAIUnitBrain().Unit, position);
         }
-
-        #region AI Unit Brain Controls
-        private void Follow(AIUnitBrain source) {
-            Vector2 dir = PlayerUnit.Position - source.Unit.Position;
-            bool moveX() {
-                if (dir.x > 0)
-                    return source.Move(source.Unit.RightPosition);
-                else
-                    return source.Move(source.Unit.LeftPosition);
-            }
-            bool moveY() {
-                if (dir.y > 0)
-                    return source.Move(source.Unit.DownPosition);
-                else
-                    return source.Move(source.Unit.UpPosition);
-            }
-            if (MathF.Abs(dir.x) > MathF.Abs(dir.y)) {
-                if (!moveX())
-                    moveY();
-            } else {
-                if (!moveY())
-                    moveX();
-            }
-        }
-
-        #endregion
-
-        #region AI Character Brain Controls
-
         #endregion
 
     }
