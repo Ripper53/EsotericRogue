@@ -5,6 +5,14 @@ namespace EsotericRogue {
     public abstract class AIUnitBrain : UnitBrain {
         protected static readonly Random rng = new Random();
 
+        protected override bool UnitCollision(Unit unit) {
+            if (unit.Brain is PlayerUnitBrain p) {
+                p.Battle(this);
+                return false;
+            }
+            return true;
+        }
+
         public abstract void PreCalculate(GameManager gameManager);
 
         public interface IView {

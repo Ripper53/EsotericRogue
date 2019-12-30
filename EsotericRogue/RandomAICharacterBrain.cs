@@ -1,11 +1,15 @@
 ﻿namespace EsotericRogue {
-    public class RandomAICharacterBrain : AICharacterBrain {
+    public class RandomAICharacterBrain : ArsenalAICharacterBrain {
 
         public override void Controls(Character targetCharacter) {
             int
-                index = rng.Next(Weapons.Count),
-                weaponIndex = rng.Next(Weapons[index].Count);
-            UseWeapon(index, weaponIndex, targetCharacter);
+                index = rng.Next(Arsenal.Count),
+                weaponIndex = rng.Next(Arsenal[index].Count);
+            if (!UseWeapon(index, weaponIndex, targetCharacter)) {
+                usedWeaponDescription = new Sprite[] {
+                    Sprite.CreateUI("Failed action!")
+                };
+            }
         }
     }
 }

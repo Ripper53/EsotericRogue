@@ -6,9 +6,9 @@ namespace EsotericRogue {
     public abstract class UI {
         public static string ContinuedString = "…";
         public delegate void ActivatedAction(UI ui);
-        public ActivatedAction Activated;
+        public event ActivatedAction Activated;
         public delegate void DeactivatedAction(UI ui);
-        public DeactivatedAction Deactivated;
+        public event DeactivatedAction Deactivated;
         private bool active = false;
         public bool Active {
             get => active;

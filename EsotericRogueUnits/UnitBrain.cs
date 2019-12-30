@@ -1,4 +1,6 @@
-﻿namespace EsotericRogue {
+﻿using System.Collections.Generic;
+
+namespace EsotericRogue {
     public abstract class UnitBrain {
         public Unit Unit { get; internal set; }
         public Scene Scene { get; internal set; }
@@ -18,11 +20,21 @@
         }
 
         private void ExecuteMoveUnitToPosition(Vector2 position) {
-            Unit unit = Scene.GetUnit(position);
-            if (unit != null && unit.Brain is IBattleUnitBrain p)
-                p.Battle(this);
-            else
-                Scene.MoveUnit(Unit, position);
+            IReadOnlyCollection<Unit> units = Scene.GetUnits(position);
+            if (units != null) {
+                foreach (Unit unit in units) {
+                    if (!UnitCollision(unit))
+                        return;
+                }
+            }
+            Scene.MoveUnit(Unit, position);
         }
+
+        /// <summary>
+        /// Return true to continue collision checks with other units.
+        /// <para>Returning false will not move the unit.</para>
+        /// </summary>
+        /// <param name="unit">Colliding unit.</param>
+        protected abstract bool UnitCollision(Unit unit);
     }
 }

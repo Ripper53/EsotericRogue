@@ -14,6 +14,7 @@ namespace EsotericRogue {
             OnSelected += OnSelected_Event;
             OnDeselected += OnDeselected_Event;
         }
+
         private void OnSelected_Event(SelectableUI source) => WriteSelected();
         private void OnDeselected_Event(SelectableUI source) => WriteUnselected(SelectedOptionIndex);
 
@@ -40,6 +41,10 @@ namespace EsotericRogue {
 
         public void AddOption(Option option) {
             options.Add(option);
+            if (Active) {
+                Clear();
+                Display();
+            }
         }
 
         public void SetOption(Option option, int index) {
@@ -50,6 +55,10 @@ namespace EsotericRogue {
             options.Remove(option);
             if (SelectedOptionIndex == options.Count)
                 SelectedOptionIndex = 0;
+            if (Active) {
+                Clear();
+                Display();
+            }
         }
 
         private int GetOffsetY() {

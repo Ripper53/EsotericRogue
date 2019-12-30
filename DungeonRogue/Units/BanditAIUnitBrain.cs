@@ -11,20 +11,48 @@ namespace DungeonRogue.Units {
         public HashSet<Vector2> View { get; set; }
         public LinkedList<Vector2> Path { get; set; }
 
+        private class BanditAICharacterBrain : ArsenalAICharacterBrain {
+
+            public override void Controls(Character enemyCharacter) {
+                for (int i = 0, count = Arsenal.Count; i < count; i++) {
+                    Weapon weapon = Arsenal[i];
+                    List<int> indexes = new List<int>(weapon.Count);
+                    for (int k = 0, kCount = weapon.Count; k < kCount; k++) {
+                        indexes.Add(k);
+                    }
+                    bool UseWeaponAction() {
+                        int pickedIndex;
+                        do {
+                            if (indexes.Count == 0)
+                                return false;
+                            pickedIndex = rng.Next(indexes.Count);
+                            indexes.RemoveAt(pickedIndex);
+                        } while (!UseWeapon(i, pickedIndex, enemyCharacter));
+                        return true;
+                    }
+                    if (UseWeaponAction())
+                        return;
+                }
+                usedWeaponDescription = new Sprite[] { Sprite.CreateUI("Failed action!") };
+            }
+        }
+
         public BanditAIUnitBrain() {
             Weapon weapon = new SteelSwordWeapon();
-            AICharacterBrain aiCharacterBrain = new RandomAICharacterBrain() {
-                Weapons = new Weapon[] {
-                    weapon
-                }
-            };
+            BanditAICharacterBrain aiCharacterBrain = new BanditAICharacterBrain();
             new Unit(new Character(3, aiCharacterBrain, weapon, new WolfFurBoot(), new WoodenChestplate(), new RubberSleeve(), new ClothPants()), this) {
                 Sprite = new Sprite("ƃ")
             };
-            Unit.Character.Name = "Bandit";
-            Unit.Character.Stamina.IncreaseMax(3);
-            Unit.Character.Stamina.Add(3);
-            Unit.Character.Stamina.Regen = 1;
+            Character character = Unit.Character;
+            character.Name = "Bandit";
+            character.Stamina.IncreaseMax(2);
+            character.Stamina.Add(2);
+            character.Stamina.Regen = 1;
+            character.Inventory.Gold = rng.Next(1, 6);
+
+            aiCharacterBrain.Arsenal = new Weapon[] {
+                character.Weapon.BareItem
+            };
         }
 
         public override void Controls() {

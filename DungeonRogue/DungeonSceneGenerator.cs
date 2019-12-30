@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using EsotericRogue;
 using DungeonRogue.Units;
+using DungeonRogue.Weapons;
+using DungeonRogue.Boots;
+using DungeonRogue.Chestplates;
+using DungeonRogue.Pants;
+using DungeonRogue.Sleeves;
 
 namespace DungeonRogue {
     public class DungeonSceneGenerator : SceneGenerator {
@@ -85,18 +90,43 @@ namespace DungeonRogue {
                 }
             }
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 1; i++) {
                 Vector2? pos = GetRandomGroundPosition();
                 if (pos.HasValue)
                     Spawn(pos.Value);
                 else
                     break;
             }
+            SpawnShop(GetRandomGroundPosition().Value);
         }
 
         #region Spawns
         private void Spawn(Vector2 position) {
             Scene.SetUnit(new BanditAIUnitBrain().Unit, position);
+        }
+
+        private void SpawnShop(Vector2 position) {
+            JadeAIUnitBrain unitBrain = new JadeAIUnitBrain();
+            Scene.SetUnit(unitBrain.Unit, position);
+            Menu menu = ((FriendlyUnit)unitBrain.Unit).Menu;
+            unitBrain.TalkSprite.Display = "I've got some items you might be interested in.";
+
+            Inventory inven = PlayerUnit.Character.Inventory;
+            int gold = inven.Gold;
+
+            void AddItem(Item item, int goldCost) {
+                menu.AddOption(new Menu.Option() {
+                    Sprites = new Sprite[] { Sprite.CreateUI($"Buy {item.Name} for {goldCost} gold.") },
+                    Action = (menu, op) => {
+                        if (inven.Buy(item, goldCost))
+                            menu.RemoveOption(op);
+                    }
+                });
+            }
+
+            if (gold >= 0) {
+                AddItem(new ClothPants(), 10);
+            }
         }
         #endregion
 

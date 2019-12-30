@@ -23,19 +23,36 @@ namespace EsotericRogue {
         };
 
         public Vector2 Size { get; private set; }
-        private Unit[,] unitsMap;
+        private readonly Dictionary<Vector2, HashSet<Unit>> unitsMap = new Dictionary<Vector2, HashSet<Unit>>();
+        private void RemoveUnitsMap(Unit unit) {
+            if (unitsMap[unit.Position].Count == 1)
+                unitsMap.Remove(unit.Position);
+            else
+                unitsMap[unit.Position].Remove(unit);
+        }
         private Tile[,] tilesMap;
         private readonly HashSet<Unit> units = new HashSet<Unit>();
         public IReadOnlyCollection<Unit> Units => units;
         private readonly List<Vector2> groundPositions = new List<Vector2>();
         public IReadOnlyList<Vector2> GroundPositions => groundPositions;
 
-        public Unit GetUnit(Vector2 position) => unitsMap[position.x, position.y];
+        public IReadOnlyCollection<Unit> GetUnits(Vector2 position) {
+            if (unitsMap.ContainsKey(position))
+                return unitsMap[position];
+            return null;
+        }
         public Tile GetTile(Vector2 position) => tilesMap[position.x, position.y];
         public void SetUnit(Unit unit, Vector2 position) {
-            unitsMap[position.x, position.y] = unit;
             unit.Position = position;
-            unit.Brain.Scene = this;
+            if (unit.Brain != null)
+                unit.Brain.Scene = this;
+            if (unitsMap.ContainsKey(position)) {
+                unitsMap[position].Add(unit);
+            } else {
+                unitsMap.Add(position, new HashSet<Unit>() {
+                    unit
+                });
+            }
             units.Add(unit);
             //Renderer.Display(unit.Sprite, position + new Vector2(1, 1)); ? Don't display unit since it might be in fog!
         }
@@ -55,15 +72,14 @@ namespace EsotericRogue {
 
         public void SetSize(Vector2 size) {
             Size = size;
-            unitsMap = new Unit[size.x, size.y];
             tilesMap = new Tile[size.x, size.y];
         }
 
         public void Reset() {
             units.Clear();
+            unitsMap.Clear();
             for (int y = 0; y < Size.y; y++) {
                 for (int x = 0; x < Size.x; x++) {
-                    unitsMap[x, y] = null;
                     tilesMap[x, y] = Tile.Wall;
                 }
             }
@@ -100,22 +116,23 @@ namespace EsotericRogue {
         }
 
         public void DisplayUnit(Vector2 position) {
-            Unit unit = GetUnit(position);
-            if (unit != null)
-                DisplaySprite(unit.Sprite, unit.Position);
+            IReadOnlyCollection<Unit> units = GetUnits(position);
+            if (units != null) {
+                foreach (Unit unit in units)
+                    DisplaySprite(unit.Sprite, unit.Position);
+            }
         }
 
         public void DestroyUnit(Unit unit) {
             if (units.Remove(unit)) {
-                unitsMap[unit.Position.x, unit.Position.y] = null;
+                RemoveUnitsMap(unit);
                 //DisplayTile(unit.Position);
             }
         }
 
         #region Internal
         internal void MoveUnit(Unit unit, Vector2 position) {
-            Vector2 oldPosition = unit.Position;
-            unitsMap[oldPosition.x, oldPosition.y] = null;
+            RemoveUnitsMap(unit);
             //DisplayTile(oldPosition); ? Don't display tile, since the tile might not be in sight of player!
             SetUnit(unit, position);
         }

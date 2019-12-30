@@ -34,16 +34,19 @@ namespace EsotericRogue {
         public readonly Equipment<Sleeve> Sleeve;
         public readonly Equipment<Pants> Pants;
 
-        /// <param name="bareWeapon">Cannot be null.</param>
-        /// <param name="bareBoot">Cannot be null.</param>
-        /// <param name="bareChestplate">Cannot be null.</param>
-        public Character(int health, CharacterBrain characterBrain, Weapon bareWeapon, Boot bareBoot, Chestplate bareChestplate, Sleeve bareSleeve, Pants barePants) {
+        public Character(int health) {
             Health = health;
             MaxHealth = health;
             Stamina = new Resource();
             Mana = new Resource();
             Energy = new Resource();
             Inventory = new Inventory(this);
+        }
+
+        /// <param name="bareWeapon">Cannot be null.</param>
+        /// <param name="bareBoot">Cannot be null.</param>
+        /// <param name="bareChestplate">Cannot be null.</param>
+        public Character(int health, CharacterBrain characterBrain, Weapon bareWeapon, Boot bareBoot, Chestplate bareChestplate, Sleeve bareSleeve, Pants barePants) : this(health) {
             Brain = characterBrain;
             Brain.Character = this;
             enchantments = new Dictionary<string, Enchantment>();

@@ -294,10 +294,14 @@ namespace EsotericRogue {
 
                 Character.Inventory.AddedItem += AddOption;
                 Character.Inventory.RemovedItem += Inventory_RemovedItem;
+
+                Character.Inventory.GoldChanged += Inventory_GoldChanged;
             };
             Deactivated += source => {
                 Character.Inventory.AddedItem -= AddOption;
                 Character.Inventory.RemovedItem -= Inventory_RemovedItem;
+
+                Character.Inventory.GoldChanged -= Inventory_GoldChanged;
             };
         }
 
@@ -361,7 +365,18 @@ namespace EsotericRogue {
         private void Inventory_RemovedItem(Inventory inventory, Item removedItem) {
             RemoveOption(removedItem);
         }
+
+        private void Inventory_GoldChanged(Inventory source, int gold, int oldGold) {
+            Vector2 pos = Position + new Vector2(6, 1);
+            Renderer.Display(Sprite.CreateEmptyUI(oldGold.ToString().Length), pos);
+            UpdateGoldSprite(gold);
+            Renderer.Display(goldSprite, pos);
+        }
         #endregion
+
+        private void UpdateGoldSprite(int gold) {
+            goldSprite.Display = GetContinuedString(gold.ToString(), maxWidth) + Environment.NewLine;
+        }
 
         protected override void DisplayUI() {
             string name = GetContinuedString(Character.Name, maxWidth);
@@ -371,7 +386,7 @@ namespace EsotericRogue {
                 stringBuilder.Append('s');
             }
             nameSprite.Display = stringBuilder.ToString();
-            goldSprite.Display = GetContinuedString(Character.Inventory.Gold.ToString(), maxWidth) + Environment.NewLine;
+            UpdateGoldSprite(Character.Inventory.Gold);
 
             itemsMenu.Position = MenuPosition;
             weaponStorage.Menu.Position = MenuPosition;

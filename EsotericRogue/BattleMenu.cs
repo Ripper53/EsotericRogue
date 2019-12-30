@@ -185,6 +185,7 @@ namespace EsotericRogue {
             UpdateDistanceSprite();
             inBattle = true;
             PlayerCharacter.RemainingDistance = PlayerCharacter.Boot.Equipped.Speed;
+            PlayerInfo.Input.UIOnly = true;
             while (enemyAlive) {
                 if (!playerAlive) {
                     PlayerInfo.Input.DeselectUI();
@@ -201,8 +202,6 @@ namespace EsotericRogue {
                     } while (exitCode != "E" && exitCode != "'E'");
                     return false;
                 }
-                if (PlayerInfo.Input.SelectedUI == null)
-                    PlayerInfo.Input.SelectedUIIndex = 0;
                 UpdateSpeedSprite();
                 PlayerCharacter.Brain.Controls(character);
                 if (enemyAlive && enemyTurn) {
@@ -223,6 +222,7 @@ namespace EsotericRogue {
                     playerDescriptionText.Display();
                 }
             }
+            PlayerInfo.Input.UIOnly = false;
             inBattle = false;
 
             // Drop

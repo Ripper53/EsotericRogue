@@ -6,16 +6,28 @@ namespace EsotericRogue {
             Unit, UI
         };
         public InputFocus Focus { get; private set; }
+        public bool UIOnly = false;
         private SelectableUI selectableUI;
         public SelectableUI SelectedUI {
             get => selectableUI;
             private set {
+                if (value == null && UIOnly)
+                    return;
                 if (selectableUI != null)
                     selectableUI.Selected = false;
                 selectableUI = value;
                 if (selectableUI != null) {
                     Focus = InputFocus.UI;
                     selectableUI.Selected = true;
+                } else if (UIOnly) {
+                    Focus = InputFocus.UI;
+                    selectableUI = GameManager.GetFirstSelectableUI();
+                    if (selectableUI == null) {
+                        UIOnly = false;
+                        Focus = InputFocus.Unit;
+                    } else {
+                        selectableUI.Selected = true;
+                    }
                 } else {
                     Focus = InputFocus.Unit;
                 }

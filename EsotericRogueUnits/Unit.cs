@@ -13,8 +13,9 @@
         public readonly Character Character;
         public readonly UnitBrain Brain;
 
-        public Unit(Character character, UnitBrain unitBrain) {
-            Character = character;
+        public Unit(Character character) => Character = character;
+
+        public Unit(Character character, UnitBrain unitBrain) : this(character) {
             Brain = unitBrain;
             Brain.Unit = this;
         }

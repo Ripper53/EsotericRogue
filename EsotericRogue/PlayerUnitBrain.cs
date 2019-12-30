@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace EsotericRogue {
-    public class PlayerUnitBrain : UnitBrain, IBattleUnitBrain {
+    public class PlayerUnitBrain : UnitBrain {
         public PlayerInput PlayerInput { get; internal set; }
         public bool ValidInput { get; private set; }
 
@@ -43,9 +44,6 @@ namespace EsotericRogue {
             switch (Scene.GetTile(position)) {
                 case Scene.Tile.Ground:
                 case Scene.Tile.Exit:
-                    Unit enemyUnit = Scene.GetUnit(position);
-                    if (enemyUnit != null)
-                        PlayerInput.GameManager.Battle(enemyUnit.Brain);
                     return true;
                 default:
                     return false;
@@ -69,9 +67,16 @@ namespace EsotericRogue {
                     // Can we see this position?
                     if (viewBrain.Contains(pos)) {
                         // If we can, display the according tile or unit.
-                        Unit unit = Scene.GetUnit(pos);
-                        if (unit != null) {
-                            Renderer.Add(unit.Sprite);
+                        IReadOnlyCollection<Unit> units = Scene.GetUnits(pos);
+                        if (units != null) {
+                            if (pos == Unit.Position) {
+                                Renderer.Add(Unit.Sprite);
+                            } else {
+                                foreach (Unit unit in units) {
+                                    Renderer.Add(unit.Sprite);
+                                    break;
+                                }
+                            }
                         } else {
                             Renderer.Add(Scene.GetTileSprite(pos));
                         }
@@ -87,6 +92,14 @@ namespace EsotericRogue {
                 Renderer.Add(Scene.BorderSprite);
             Renderer.Add(Environment.NewLine);
             Renderer.Display();
+        }
+
+        protected override bool UnitCollision(Unit unit) {
+            if (unit is FriendlyUnit friendlyUnit)
+                friendlyUnit.Interact(this);
+            else
+                PlayerInput.GameManager.Battle(unit.Brain);
+            return true;
         }
     }
 }
