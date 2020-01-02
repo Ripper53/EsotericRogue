@@ -27,7 +27,7 @@ namespace EsotericRogue {
             }
 
             public override IEnumerable<Sprite> GetDescription() {
-                return GetDamageDescription(Description, this, Range);
+                return GetDamageDescription(Description, this);
             }
         }
         private class HealAction : Action, Enchantment.IHeal {

@@ -5,7 +5,7 @@ namespace DungeonRogue.Chestplates {
         public override string Name => "Steel Chestplate";
 
         public SteelChestplate() {
-            PhysicalDefense = 5;
+            PhysicalDefense = 10;
         }
     }
 }

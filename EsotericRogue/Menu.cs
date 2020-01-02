@@ -89,9 +89,12 @@ namespace EsotericRogue {
             }
         }
 
+        protected int GetY(int optionIndex) {
+            return Position.y + optionIndex + GetOffsetY();
+        }
         private void WriteSelected() {
             if (options.Count > 0)
-                Renderer.Display(SelectedSprite, new Vector2(Position.x, Position.y + SelectedOptionIndex + GetOffsetY()));
+                Renderer.Display(SelectedSprite, new Vector2(Position.x, GetY(SelectedOptionIndex)));
         }
 
         public void NextOption() {
@@ -123,14 +126,24 @@ namespace EsotericRogue {
                     Renderer.Add(sprite);
             }
         }
+        private int[] clearOptions;
+        protected void ClearOption(int optionIndex) {
+            Renderer.Display(Sprite.CreateEmptyUI(clearOptions[optionIndex]), new Vector2(Position.x, GetY(optionIndex)));
+        }
         protected void DisplayOptions() {
-            for (int i = 0; i < options.Count; i++) {
+            int count = options.Count;
+            clearOptions = new int[count];
+            for (int i = 0; i < count; i++) {
                 if (Selected && i == SelectedOptionIndex)
                     Renderer.Add(SelectedSprite);
                 else
                     Renderer.Add(DeselectedSprite);
-                foreach (Sprite sprite in options[i].Sprites)
+                int c = 0;
+                foreach (Sprite sprite in options[i].Sprites) {
+                    c += sprite.Display.Length;
                     Renderer.Add(sprite);
+                }
+                clearOptions[i] = c;
                 Renderer.Add(Environment.NewLine);
             }
         }

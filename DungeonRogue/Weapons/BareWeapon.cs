@@ -20,12 +20,11 @@ namespace DungeonRogue.Weapons {
             }
 
             public override IEnumerable<Sprite> GetDescription() {
-                return GetDamageDescription("Punch", this, Range);
+                return GetDamageDescription("Punch", this);
             }
 
             protected override bool Execute(BareWeapon source, Character targetCharacter, int distance) {
-                targetCharacter.Damage(Damage, DamageType.Physical);
-                return true;
+                return ExecuteDamageAction(this, targetCharacter);
             }
         }
     }

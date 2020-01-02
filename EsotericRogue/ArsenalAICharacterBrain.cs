@@ -18,5 +18,30 @@ namespace EsotericRogue {
         public override IEnumerable<Sprite> GetDescription() {
             return usedWeaponDescription;
         }
+
+        #region Static
+        protected static void Controls(ArsenalAICharacterBrain characterBrain, Character enemyCharacter) {
+            for (int i = 0, count = characterBrain.Arsenal.Count; i < count; i++) {
+                Weapon weapon = characterBrain.Arsenal[i];
+                List<int> indexes = new List<int>(weapon.Count);
+                for (int k = 0, kCount = weapon.Count; k < kCount; k++) {
+                    indexes.Add(k);
+                }
+                bool UseWeaponAction() {
+                    int pickedIndex;
+                    do {
+                        if (indexes.Count == 0)
+                            return false;
+                        pickedIndex = rng.Next(indexes.Count);
+                        indexes.RemoveAt(pickedIndex);
+                    } while (!characterBrain.UseWeapon(i, pickedIndex, enemyCharacter));
+                    return true;
+                }
+                if (UseWeaponAction())
+                    return;
+            }
+            characterBrain.usedWeaponDescription = new Sprite[] { Sprite.CreateUI("Resting…") };
+        }
+        #endregion
     }
 }

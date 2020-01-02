@@ -11,6 +11,8 @@ namespace EsotericRogue {
             return null;
         }
 
+        public static Vector2 CursorPosition => new Vector2(Console.CursorLeft, Console.CursorTop);
+
         public static int BufferWidth {
             get => Console.BufferWidth;
             set {

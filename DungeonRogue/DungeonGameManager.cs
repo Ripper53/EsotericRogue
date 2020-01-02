@@ -5,6 +5,7 @@ using DungeonRogue.Boots;
 using DungeonRogue.Chestplates;
 using DungeonRogue.Sleeves;
 using DungeonRogue.Pants;
+using DungeonRogue.Ammunition;
 
 namespace DungeonRogue {
     public class DungeonGameManager : GameManager {
@@ -17,6 +18,11 @@ namespace DungeonRogue {
         ) {
             PlayerInfo.Character.Stamina.IncreaseMax(5);
             PlayerInfo.Character.Stamina.Regen = 1;
+            PlayerInfo.Character.Inventory.AddItem(new WoodenBowWeapon());
+            for (int i = 0; i < 5; i++)
+                PlayerInfo.Character.Inventory.AddItem(new Arrow());
+
+            PlayerInfo.Character.Inventory.RemoveItems<Arrow>(1);
         }
 
         protected override bool Start() {

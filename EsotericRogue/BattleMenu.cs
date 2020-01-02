@@ -227,8 +227,8 @@ namespace EsotericRogue {
 
             // Drop
             PlayerCharacter.Inventory.Gold += character.Inventory.Gold;
-            foreach (Item item in character.Inventory) {
-                PlayerCharacter.Inventory.AddItem(item);
+            while (character.Inventory.Count > 0) {
+                PlayerCharacter.Inventory.AddItem(character.Inventory[0]);
             }
 
             // Clean up

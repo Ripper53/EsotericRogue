@@ -22,15 +22,11 @@ namespace DungeonRogue.Weapons {
             }
 
             public override IEnumerable<Sprite> GetDescription() {
-                return GetDamageDescription("Swing", this, Range);
+                return GetDamageStaminaDescription("Swing", this);
             }
 
             protected override bool Execute(SteelSwordWeapon source, Character targetCharacter, int distance) {
-                if (source.Character.Stamina.Use(StaminaCost)) {
-                    targetCharacter.Damage(Damage, DamageType);
-                    return true;
-                }
-                return false;
+                return ExecuteDamageStaminaAction(source, this, targetCharacter);
             }
         }
     }

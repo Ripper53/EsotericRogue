@@ -14,26 +14,7 @@ namespace DungeonRogue.Units {
         private class BanditAICharacterBrain : ArsenalAICharacterBrain {
 
             public override void Controls(Character enemyCharacter) {
-                for (int i = 0, count = Arsenal.Count; i < count; i++) {
-                    Weapon weapon = Arsenal[i];
-                    List<int> indexes = new List<int>(weapon.Count);
-                    for (int k = 0, kCount = weapon.Count; k < kCount; k++) {
-                        indexes.Add(k);
-                    }
-                    bool UseWeaponAction() {
-                        int pickedIndex;
-                        do {
-                            if (indexes.Count == 0)
-                                return false;
-                            pickedIndex = rng.Next(indexes.Count);
-                            indexes.RemoveAt(pickedIndex);
-                        } while (!UseWeapon(i, pickedIndex, enemyCharacter));
-                        return true;
-                    }
-                    if (UseWeaponAction())
-                        return;
-                }
-                usedWeaponDescription = new Sprite[] { Sprite.CreateUI("Failed action!") };
+                Controls(this, enemyCharacter);
             }
         }
 

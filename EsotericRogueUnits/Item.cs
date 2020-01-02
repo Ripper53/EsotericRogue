@@ -8,6 +8,9 @@
         /// True if item is removed from inventory when used, otherwise false.
         /// </summary>
         public abstract bool Consumable { get; }
+        /// <summary>
+        /// Added inventory.
+        /// </summary>
         public Inventory Inventory { get; internal set; }
 
         public bool Use(Character character) {

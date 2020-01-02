@@ -12,12 +12,14 @@ namespace DungeonRogue {
     public class DungeonSceneGenerator : SceneGenerator {
         private static readonly Random rng = new Random();
 
-        public int MinNumberOfRoom = 3, MaxNumberOfRoom = 10;
+        public int MinNumberOfRoom = 10, MaxNumberOfRoom = 20;
         public Vector2 MinRoomSize = new Vector2(2, 2), MaxRoomSize = new Vector2(10, 10);
 
         public DungeonSceneGenerator(Scene scene) : base(scene) { }
 
+        private int dungeonNumber = 0;
         public override void Generate() {
+            dungeonNumber++;
             Scene.Reset();
             int roomCount = rng.Next(MinNumberOfRoom, MaxNumberOfRoom);
             Vector2[] roomPositions = new Vector2[roomCount];
@@ -102,7 +104,12 @@ namespace DungeonRogue {
 
         #region Spawns
         private void Spawn(Vector2 position) {
-            Scene.SetUnit(new BanditAIUnitBrain().Unit, position);
+
+            if (dungeonNumber > 1) {
+                Scene.SetUnit(new OrcAIUnitBrain().Unit, position);
+            } else if (dungeonNumber > 0) {
+                Scene.SetUnit(new BanditAIUnitBrain().Unit, position);
+            }
         }
 
         private void SpawnShop(Vector2 position) {

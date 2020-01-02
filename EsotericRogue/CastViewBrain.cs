@@ -15,12 +15,14 @@ namespace EsotericRogue {
             bool CanSee(Vector2 position) => scene.GetTile(position) != Scene.Tile.Wall;
 
             int CanSeeCast(Vector2 origin, Vector2 add, int maxCount) {
+                bool cannotSee = false;
                 for (int i = 0, obstacleI = 0; i < maxCount && scene.InBounds(origin); i++) {
                     // Can see after because we should be able to see the first wall hit!
-                    if (!CanSee(origin)) {
+                    if (cannotSee || !CanSee(origin)) {
+                        cannotSee = true;
                         obstacleI++;
                         if (obstacleI > obstacleCount)
-                            return i + 1;
+                            return i;
                     }
                     positions.Add(origin);
                     origin += add;
