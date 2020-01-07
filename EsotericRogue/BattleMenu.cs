@@ -60,14 +60,14 @@ namespace EsotericRogue {
             );
 
             PlayerCharacter.Weapon.ItemEquipped += PlayerCharacter_WeaponEquipped;
-            PlayerCharacter_WeaponEquipped(PlayerCharacter, PlayerCharacter.Weapon.Equipped, null);
+            PlayerCharacter_WeaponEquipped(PlayerCharacter.Weapon, PlayerCharacter.Weapon.Equipped, null);
         }
 
         private int GetDistance() {
             return Math.Abs(PlayerCharacter.Distance - enemyCharacter.Distance);
         }
 
-        private void PlayerCharacter_WeaponEquipped(Character character, Weapon weapon, Weapon oldWeapon) {
+        private void PlayerCharacter_WeaponEquipped(Equipment<Weapon> source, Weapon weapon, Weapon oldWeapon) {
             ClearWeaponOptions();
             for (int i = 0; i < weapon.Count; i++) {
                 Weapon.Action action = weapon[i];
@@ -222,25 +222,64 @@ namespace EsotericRogue {
                     playerDescriptionText.Display();
                 }
             }
-            PlayerInfo.Input.UIOnly = false;
             inBattle = false;
 
-            // Drop
-            PlayerCharacter.Inventory.Gold += character.Inventory.Gold;
-            while (character.Inventory.Count > 0) {
-                PlayerCharacter.Inventory.AddItem(character.Inventory[0]);
-            }
-
-            // Clean up
             GameManager.RemoveUI(this);
-            GameManager.PlayerInfo.InfoUI.Position = previousInfoUIPos;
-            GameManager.PlayerInfo.InventoryMenu.Position = previousInventoryMenuPos;
+            GameManager.RemoveUI(PlayerInfo.InfoUI);
             GameManager.RemoveUI(enemyInfo);
             GameManager.RemoveUI(vsText);
             GameManager.RemoveUI(playerNameDescriptionText);
             GameManager.RemoveUI(enemyNameDescriptionText);
             GameManager.RemoveUI(playerDescriptionText);
             GameManager.RemoveUI(enemyDescriptionText);
+
+            bool looting = true;
+            PlayerCharacter.Inventory.Gold += character.Inventory.Gold;
+            character.Inventory.Gold = 0;
+
+            GameManager.RemoveUI(PlayerInfo.InventoryMenu);
+            LootInventoryMenu
+                toPlayerLootMenu = new LootInventoryMenu(GameManager, character, PlayerCharacter.Inventory) {
+                    Position = new Vector2(0, 2)
+                },
+                toEnemyLootMenu = new LootInventoryMenu(GameManager, PlayerCharacter, character.Inventory) {
+                    Position = new Vector2(21, 2)
+                };
+            Menu lootDoneMenu = new Menu() {
+                Sprites = new Sprite[] {
+                    new Sprite("Loot" + Environment.NewLine)
+                },
+                Position = new Vector2(0, 0)
+            };
+            lootDoneMenu.AddOption(new Option() {
+                Sprites = new Sprite[] {
+                    new Sprite("Done", ConsoleColor.Red, ConsoleColor.Black)
+                },
+                Action = (menu, op) => looting = false
+            });
+            GameManager.AddUI(toPlayerLootMenu);
+            GameManager.AddUI(toEnemyLootMenu);
+            GameManager.RemoveUI(toEnemyLootMenu);
+            GameManager.AddUI(toEnemyLootMenu);
+            GameManager.AddUI(lootDoneMenu);
+            PlayerInfo.Input.SelectedUIIndex = 0;
+
+            Renderer.Clear();
+            GameManager.DisplayUI();
+            while (looting) {
+                PlayerInfo.Input.UIControls();
+            }
+            GameManager.RemoveUI(toPlayerLootMenu);
+            GameManager.RemoveUI(toEnemyLootMenu);
+            GameManager.RemoveUI(lootDoneMenu);
+            GameManager.AddUI(PlayerInfo.InfoUI);
+            GameManager.AddUI(PlayerInfo.InventoryMenu);
+
+            PlayerInfo.Input.UIOnly = false;
+
+            // Clean up
+            GameManager.PlayerInfo.InfoUI.Position = previousInfoUIPos;
+            GameManager.PlayerInfo.InventoryMenu.Position = previousInventoryMenuPos;
             GameManager.PlayerInfo.Input.DeselectUI();
             Renderer.Clear();
             GameManager.Display();

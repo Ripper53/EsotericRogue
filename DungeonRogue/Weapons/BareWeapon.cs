@@ -7,7 +7,7 @@ namespace DungeonRogue.Weapons {
         private readonly Action[] actions = new Action[] {
             new PunchAction()
         };
-        protected override IList<Weapon.Action> Actions => actions;
+        protected override IReadOnlyList<Weapon.Action> Actions => actions;
 
         private class PunchAction : Action, Enchantment.IDamage {
             public int Damage { get; set; }

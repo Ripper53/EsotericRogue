@@ -4,6 +4,7 @@
         /// Unique item name.
         /// </summary>
         public abstract string Name { get; }
+        public int Space { get; private set; } = 1;
         /// <summary>
         /// True if item is removed from inventory when used, otherwise false.
         /// </summary>

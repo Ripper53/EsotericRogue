@@ -20,8 +20,8 @@ namespace DungeonRogue.Units {
 
         public BanditAIUnitBrain() {
             Weapon weapon = new SteelSwordWeapon();
-            BanditAICharacterBrain aiCharacterBrain = new BanditAICharacterBrain();
-            new Unit(new Character(3, aiCharacterBrain, weapon, new WolfFurBoot(), new WoodenChestplate(), new RubberSleeve(), new ClothPants()), this) {
+            BanditAICharacterBrain characterBrain = new BanditAICharacterBrain();
+            new Unit(new Character(3, characterBrain, weapon, new WolfFurBoot(), new WoodenChestplate(), new RubberSleeve(), new ClothPants()), this) {
                 Sprite = new Sprite("ƃ")
             };
             Character character = Unit.Character;
@@ -30,10 +30,9 @@ namespace DungeonRogue.Units {
             character.Stamina.Add(2);
             character.Stamina.Regen = 1;
             character.Inventory.Gold = rng.Next(1, 6);
+            character.Inventory.AddItem(weapon);
 
-            aiCharacterBrain.Arsenal = new Weapon[] {
-                character.Weapon.BareItem
-            };
+            ArsenalAICharacterBrain.ArsenalConstructor(characterBrain);
         }
 
         public override void Controls() {

@@ -17,12 +17,17 @@ namespace EsotericRogue {
         }
 
         private readonly List<Item> items;
+        public int Space;
+        public int TakenSpace { get; private set; }
         public int Count => items.Count;
+        //public void Clear() => items.Clear();
 
         public Inventory(Character character) {
             Character = character;
             gold = 0;
             items = new List<Item>();
+            Space = 30;
+            TakenSpace = 0;
         }
 
         public Item this[int index] => items[index];
@@ -38,7 +43,9 @@ namespace EsotericRogue {
         public event AddedItemAction AddedItem;
 
         public bool AddItem(Item item) {
-            if (items.Contains(item)) return false;
+            int takenSpace = TakenSpace + item.Space;
+            if (takenSpace > Space || items.Contains(item)) return false;
+            TakenSpace = takenSpace;
             if (item.Inventory != null)
                 item.Inventory.RemoveItem(item);
             item.Inventory = this;
@@ -49,11 +56,15 @@ namespace EsotericRogue {
 
         public delegate void RemovedItemAction(Inventory inventory, Item removedItem);
         public event RemovedItemAction RemovedItem;
+        private void RemoveItemEvent(Item item) {
+            TakenSpace -= item.Space;
+            item.Inventory = null;
+            RemovedItem?.Invoke(this, item);
+        }
 
         public bool RemoveItem(Item item) {
             if (items.Remove(item)) {
-                item.Inventory = null;
-                RemovedItem?.Invoke(this, item);
+                RemoveItemEvent(item);
                 return true;
             }
             return false;
@@ -73,9 +84,8 @@ namespace EsotericRogue {
             }
             foreach (int i in toRemoveIndexes) {
                 Item item = items[i];
-                item.Inventory = null;
                 items.RemoveAt(i);
-                RemovedItem?.Invoke(this, item);
+                RemoveItemEvent(item);
             }
         }
 

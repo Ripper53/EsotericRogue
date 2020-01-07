@@ -1,8 +1,8 @@
 ﻿namespace EsotericRogue {
     public class Equipment<T> where T : EquippableItem {
-        private readonly Character character;
+        public readonly Character Character;
         public readonly T BareItem;
-        public delegate void ItemEquippedAction(Character character, T item, T oldItem);
+        public delegate void ItemEquippedAction(Equipment<T> source, T item, T oldItem);
         public event ItemEquippedAction ItemEquipped;
         private T equipped;
         public T Equipped {
@@ -10,22 +10,22 @@
             set {
                 T oldWeapon = equipped;
                 oldWeapon.Character = null;
-                if (value == null)
+                if (value == null || value == equipped)
                     value = BareItem;
                 equipped = value;
-                equipped.Character = character;
-                ItemEquipped?.Invoke(character, equipped, oldWeapon);
+                equipped.Character = Character;
+                ItemEquipped?.Invoke(this, equipped, oldWeapon);
             }
         }
 
         /// <param name="character">Owner of equipment.</param>
         /// <param name="bareItem">Default value, sets to this when Equipped = null. Cannot be null.</param>
         public Equipment(Character character, T bareItem) {
-            this.character = character;
-            this.BareItem = bareItem;
+            Character = character;
+            BareItem = bareItem;
             equipped = bareItem;
             Equipped = bareItem;
-            character.Inventory.AddItem(bareItem);
+            //character.Inventory.AddItem(bareItem);
         }
     }
 }

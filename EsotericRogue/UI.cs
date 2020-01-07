@@ -13,14 +13,11 @@ namespace EsotericRogue {
         public bool Active {
             get => active;
             internal set {
-                bool procEvent = active != value;
                 active = value;
-                if (procEvent) {
-                    if (active)
-                        Activated?.Invoke(this);
-                    else
-                        Deactivated?.Invoke(this);
-                }
+                if (active)
+                    Activated?.Invoke(this);
+                else
+                    Deactivated?.Invoke(this);
             }
         }
         public Vector2 Position;

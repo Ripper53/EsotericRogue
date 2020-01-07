@@ -24,7 +24,7 @@ namespace EsotericRogue {
 
         #region Static
         private static readonly AStarPathfinder aStarPathfinder = new AStarPathfinder();
-        public static void FindAStarPath<T>(T ai, Vector2 end) where T : AIUnitBrain, IPathfinder {
+        protected static void FindAStarPath<T>(T ai, Vector2 end) where T : AIUnitBrain, IPathfinder {
             ai.Path = aStarPathfinder.FindPath(ai.Scene, ai.Unit.Position, end);
         }
         #endregion

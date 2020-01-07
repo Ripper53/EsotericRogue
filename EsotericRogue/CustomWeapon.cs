@@ -7,7 +7,7 @@ namespace EsotericRogue {
         public override string Name => name;
         public void SetName(string name) => this.name = "[C] " + name;
         private readonly Action[] actions;
-        protected override IList<Weapon.Action> Actions => actions;
+        protected override IReadOnlyList<Weapon.Action> Actions => actions;
 
         #region Actions
         private abstract new class Action : Weapon<CustomWeapon>.Action {

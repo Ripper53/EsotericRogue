@@ -6,7 +6,7 @@
         public readonly PlayerCharacterBrain CharacterBrain;
         public readonly PlayerInput Input;
         public readonly InfoUI InfoUI;
-        public readonly InventoryMenu InventoryMenu;
+        public readonly ManageInventoryMenu InventoryMenu;
 
         public PlayerInfo(GameManager gameManager, Unit playerUnit) {
             Unit = playerUnit;
@@ -15,7 +15,7 @@
             CharacterBrain = (PlayerCharacterBrain)Character.Brain;
             Input = new PlayerInput(gameManager, UnitBrain);
             InfoUI = new InfoUI(playerUnit.Character);
-            InventoryMenu = new InventoryMenu(gameManager, Character);
+            InventoryMenu = new ManageInventoryMenu(gameManager, Character);
             CharacterBrain.PlayerInfo = this;
         }
     }

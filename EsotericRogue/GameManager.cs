@@ -36,8 +36,8 @@ namespace EsotericRogue {
             uis.Remove(ui);
             if (ui is SelectableUI selectableUI) {
                 selectableUIs.Remove(selectableUI);
-                if (PlayerInfo.Input.SelectedUI == selectableUI)
-                    PlayerInfo.Input.SelectedUIIndex--;
+                if (PlayerInfo.Input.SelectedUIIndex >= SelectableUICount)
+                    PlayerInfo.Input.SelectedUIIndex = 0;
             }
             return true;
         }

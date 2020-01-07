@@ -42,6 +42,12 @@ namespace EsotericRogue {
             }
             characterBrain.usedWeaponDescription = new Sprite[] { Sprite.CreateUI("Resting…") };
         }
+
+        public static void ArsenalConstructor(ArsenalAICharacterBrain characterBrain) {
+            characterBrain.Arsenal = new Weapon[] {
+                characterBrain.Character.Weapon.BareItem
+            };
+        }
         #endregion
     }
 }

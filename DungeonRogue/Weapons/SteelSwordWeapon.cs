@@ -7,7 +7,7 @@ namespace DungeonRogue.Weapons {
         private readonly Weapon.Action[] actions = new Weapon.Action[] {
             new SwingAction()
         };
-        protected override IList<Weapon.Action> Actions => actions;
+        protected override IReadOnlyList<Weapon.Action> Actions => actions;
 
         private class SwingAction : Action, Enchantment.IDamage, Enchantment.IStaminaCost {
             public int Damage { get; set; }

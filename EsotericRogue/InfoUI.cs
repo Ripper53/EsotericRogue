@@ -52,7 +52,7 @@ namespace EsotericRogue {
         private Vector2 GetWeaponEquippedPosition(Vector2 position) => position + new Vector2(8, OffsetY + 5);
         private string GetWeaponName(Weapon weapon) => GetContinuedString(weapon.Name.PadRight(lastWeaponName.Length), MaxWidth - 8);
         private string lastWeaponName = string.Empty;
-        private void Character_WeaponEquipped(Character character, Weapon weapon, Weapon oldWeapon) {
+        private void Character_WeaponEquipped(Equipment<Weapon> source, Weapon weapon, Weapon oldWeapon) {
             lastWeaponName = GetWeaponName(weapon);
             Renderer.Display(Sprite.CreateUI(lastWeaponName), GetWeaponEquippedPosition(Position));
         }
@@ -98,7 +98,7 @@ namespace EsotericRogue {
             Stamina_ValueChanged(Character.Stamina, Character.Stamina.Value);
             Mana_ValueChanged(Character.Mana, Character.Mana.Value);
             Energy_ValueChanged(Character.Energy, Character.Energy.Value);
-            Character_WeaponEquipped(Character, Character.Weapon.Equipped, Character.Weapon.Equipped);
+            Character_WeaponEquipped(Character.Weapon, Character.Weapon.Equipped, Character.Weapon.Equipped);
         }
 
         public override void Clear() {

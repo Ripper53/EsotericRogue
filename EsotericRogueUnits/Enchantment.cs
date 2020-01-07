@@ -22,6 +22,7 @@ namespace EsotericRogue {
         protected abstract void Enchant(Character character);
         public void Disenchant() => Disenchant(character);
         protected abstract void Disenchant(Character character);
+        public abstract IEnumerable<Sprite> GetDescription();
 
         public interface IDamage {
             int Damage { get; set; }
@@ -39,6 +40,16 @@ namespace EsotericRogue {
         }
         public interface IEnergyCost {
             int EnergyCost { get; set; }
+        }
+
+        public interface IStaminaAdd {
+            int StaminaAdd { get; set; }
+        }
+        public interface IManaAdd {
+            int ManaAdd { get; set; }
+        }
+        public interface IEnergyAdd {
+            int EnergyAdd { get; set; }
         }
 
         public interface IPhysicalDefense {

@@ -92,25 +92,41 @@ namespace DungeonRogue {
                 }
             }
 
-            for (int i = 0; i < 1; i++) {
-                Vector2? pos = GetRandomGroundPosition();
-                if (pos.HasValue)
-                    Spawn(pos.Value);
-                else
-                    break;
-            }
-            SpawnShop(GetRandomGroundPosition().Value);
+            Spawn(GetRandomGroundPosition);
         }
 
         #region Spawns
-        private void Spawn(Vector2 position) {
+        private delegate Vector2? GetGroundPositionFunc();
+        public delegate void SpawnAction(Vector2 position);
+        private readonly List<SpawnAction> spawnActions = new List<SpawnAction>();
+        private void Spawn(GetGroundPositionFunc getGroundPositionFunc) {
+            int numberOfEnemies = dungeonNumber;
+            if (numberOfEnemies > 20)
+                numberOfEnemies = rng.Next(2, 21);
 
-            if (dungeonNumber > 1) {
-                Scene.SetUnit(new OrcAIUnitBrain().Unit, position);
-            } else if (dungeonNumber > 0) {
-                Scene.SetUnit(new BanditAIUnitBrain().Unit, position);
+            switch (dungeonNumber) {
+                case 2:
+                    spawnActions.Add(SpawnOrc);
+                    break;
+                case 3:
+                    spawnActions.Add(SpawnFireTroll);
+                    break;
+                default:
+                    spawnActions.Add(SpawnBandit);
+                    break;
+            }
+
+            for (int i = 0, spawnCount = spawnActions.Count; i < numberOfEnemies; i++) {
+                Vector2? position = getGroundPositionFunc();
+                if (position.HasValue)
+                    spawnActions[rng.Next(spawnCount)](position.Value);
+                else
+                    break;
             }
         }
+        private void SpawnBandit(Vector2 position) => Scene.SetUnit(new BanditAIUnitBrain().Unit, position);
+        private void SpawnOrc(Vector2 position) => Scene.SetUnit(new OrcAIUnitBrain().Unit, position);
+        private void SpawnFireTroll(Vector2 position) => Scene.SetUnit(new FireTrollAIUnitBrain().Unit, position);
 
         private void SpawnShop(Vector2 position) {
             JadeAIUnitBrain unitBrain = new JadeAIUnitBrain();

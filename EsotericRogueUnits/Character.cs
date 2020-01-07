@@ -26,7 +26,7 @@ namespace EsotericRogue {
             Energy;
         public readonly Inventory Inventory;
         public readonly CharacterBrain Brain;
-        private readonly Dictionary<string, Enchantment> enchantments;
+        private readonly List<Enchantment> enchantments;
 
         public readonly Equipment<Weapon> Weapon;
         public readonly Equipment<Boot> Boot;
@@ -49,7 +49,7 @@ namespace EsotericRogue {
         public Character(int health, CharacterBrain characterBrain, Weapon bareWeapon, Boot bareBoot, Chestplate bareChestplate, Sleeve bareSleeve, Pants barePants) : this(health) {
             Brain = characterBrain;
             Brain.Character = this;
-            enchantments = new Dictionary<string, Enchantment>();
+            enchantments = new List<Enchantment>();
             Weapon = new Equipment<Weapon>(this, bareWeapon);
             Boot = new Equipment<Boot>(this, bareBoot);
             Chestplate = new Equipment<Chestplate>(this, bareChestplate);
@@ -58,26 +58,27 @@ namespace EsotericRogue {
         }
 
         internal void Enchant(Enchantment enchantment) {
-            if (enchantments.ContainsKey(enchantment.Name)) {
-                enchantments[enchantment.Name].StepCount = enchantment.StepsDuration;
-            } else {
-                enchantment.Enchant();
-                enchantments.Add(enchantment.Name, enchantment);
-            }
+            enchantments.Add(enchantment);
+            enchantment.StepCount = enchantment.StepsDuration;
+            enchantment.Enchant();
         }
+        public delegate void StepAction(Character character);
+        public event StepAction Stepped;
         public void Step() {
-            List<Enchantment> toRemove = new List<Enchantment>(enchantments.Count);
-            foreach (Enchantment enchantment in enchantments.Values) {
+            int count = this.enchantments.Count;
+            Enchantment[] enchantments = new Enchantment[count];
+            for (int i = 0; i < count; i++)
+                enchantments[i] = this.enchantments[i];
+            foreach (Enchantment enchantment in enchantments) {
                 enchantment.StepCount--;
                 if (enchantment.StepCount == 0) {
                     enchantment.Disenchant();
-                    toRemove.Add(enchantment);
+                    this.enchantments.Remove(enchantment);
                 }
             }
-            foreach (Enchantment enchantment in toRemove)
-                enchantments.Remove(enchantment.Name);
 
             ResourceStep();
+            Stepped?.Invoke(this);
         }
         public void ResourceStep() {
             Stamina.Step();

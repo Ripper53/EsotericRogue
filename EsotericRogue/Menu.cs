@@ -35,8 +35,16 @@ namespace EsotericRogue {
             options.Clear();
         }
         public void RemoveRangeOptions(int index, int count) {
-            SelectedOptionIndex = 0;
             options.RemoveRange(index, count);
+            DisplayRemoved();
+        }
+        private void DisplayRemoved() {
+            if (SelectedOptionIndex >= options.Count)
+                SelectedOptionIndex = 0;
+            if (Active) {
+                Clear();
+                Display();
+            }
         }
 
         public void AddOption(Option option) {
@@ -53,12 +61,7 @@ namespace EsotericRogue {
 
         public void RemoveOption(Option option) {
             options.Remove(option);
-            if (SelectedOptionIndex == options.Count)
-                SelectedOptionIndex = 0;
-            if (Active) {
-                Clear();
-                Display();
-            }
+            DisplayRemoved();
         }
 
         private int GetOffsetY() {
@@ -89,7 +92,7 @@ namespace EsotericRogue {
             }
         }
 
-        protected int GetY(int optionIndex) {
+        private int GetY(int optionIndex) {
             return Position.y + optionIndex + GetOffsetY();
         }
         private void WriteSelected() {
@@ -126,9 +129,11 @@ namespace EsotericRogue {
                     Renderer.Add(sprite);
             }
         }
-        private int[] clearOptions;
+        protected Vector2 GetOptionPosition(int optionIndex) => new Vector2(Position.x + 1, GetY(optionIndex));
+
+        protected int[] clearOptions;
         protected void ClearOption(int optionIndex) {
-            Renderer.Display(Sprite.CreateEmptyUI(clearOptions[optionIndex]), new Vector2(Position.x, GetY(optionIndex)));
+            Renderer.Display(Sprite.CreateEmptyUI(clearOptions[optionIndex]), GetOptionPosition(optionIndex));
         }
         protected void DisplayOptions() {
             int count = options.Count;

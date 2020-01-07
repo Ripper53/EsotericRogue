@@ -23,6 +23,7 @@ namespace EsotericRogue {
             public int Range = 1;
             public abstract IEnumerable<Sprite> GetDescription();
 
+            #region Static
             private static Sprite GetRangeSprite(int range) => Sprite.CreateUI($"[Range: {range}]");
 
             public static Sprite[] GetDamageDescription<T>(string attackDescription, T enchantment) where T : Action, Enchantment.IDamage {
@@ -34,18 +35,31 @@ namespace EsotericRogue {
                 };
             }
 
-            public static Sprite[] GetDamageStaminaDescription<T>(string attackDescription, T enchantment) where T : Action, Enchantment.IDamage, Enchantment.IStaminaCost {
+            private static Sprite[] GetDamageCostDescription<T>(string attackDescription, T enchantment, int cost, string costName) where T : Action, Enchantment.IDamage {
                 return new Sprite[] {
                     Sprite.CreateUI(attackDescription + " for "),
                     new Sprite(enchantment.Damage.ToString(), GetDamageColor(enchantment.DamageType), ConsoleColor.Black),
                     Sprite.CreateUI(" damage, costs "),
-                    new Sprite(enchantment.StaminaCost.ToString(), GetDamageColor(DamageType.Physical), ConsoleColor.Black),
-                    Sprite.CreateUI(" stamina. "),
+                    new Sprite(cost.ToString(), GetDamageColor(enchantment.DamageType), ConsoleColor.Black),
+                    Sprite.CreateUI($" {costName}. "),
                     GetRangeSprite(enchantment.Range)
                 };
             }
+
+            protected static Sprite[] GetDamageStaminaDescription<T>(string attackDescription, T enchantment) where T : Action, Enchantment.IDamage, Enchantment.IStaminaCost {
+                return GetDamageCostDescription(attackDescription, enchantment, enchantment.StaminaCost, "stamina");
+            }
+
+            protected static Sprite[] GetDamageManaDescription<T>(string attackDescription, T enchantment) where T : Action, Enchantment.IDamage, Enchantment.IManaCost {
+                return GetDamageCostDescription(attackDescription, enchantment, enchantment.ManaCost, "mana");
+            }
+
+            protected static Sprite[] GetDamageEnergyDescription<T>(string attackDescription, T enchantment) where T : Action, Enchantment.IDamage, Enchantment.IEnergyCost {
+                return GetDamageCostDescription(attackDescription, enchantment, enchantment.EnergyCost, "energy");
+            }
+            #endregion
         }
-        protected abstract IList<Action> Actions { get; }
+        protected abstract IReadOnlyList<Action> Actions { get; }
         public int Count => Actions.Count;
         public Action this[int index] => Actions[index];
 
@@ -57,7 +71,7 @@ namespace EsotericRogue {
         public abstract bool Use(int index, Character targetCharacter);
 
         public IEnumerator<Action> GetEnumerator() {
-            return (IEnumerator<Action>)Actions;
+            return Actions.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
@@ -82,12 +96,22 @@ namespace EsotericRogue {
                 targetCharacter.Damage(source.Damage, source.DamageType);
                 return true;
             }
-            protected static bool ExecuteDamageStaminaAction<ActionT>(T weapon, ActionT source, Character targetCharacter) where ActionT : Action, Enchantment.IDamage, Enchantment.IStaminaCost {
-                if (weapon.Character.Stamina.Use(source.StaminaCost)) {
+
+            private static bool ExecuteDamageResourceAction<ActionT>(Resource resource, int cost, ActionT source, Character targetCharacter) where ActionT : Action, Enchantment.IDamage {
+                if (resource.Use(cost)) {
                     targetCharacter.Damage(source.Damage, source.DamageType);
                     return true;
                 }
                 return false;
+            }
+            protected static bool ExecuteDamageStaminaAction<ActionT>(T weapon, ActionT source, Character targetCharacter) where ActionT : Action, Enchantment.IDamage, Enchantment.IStaminaCost {
+                return ExecuteDamageResourceAction(weapon.Character.Stamina, source.StaminaCost, source, targetCharacter);
+            }
+            protected static bool ExecuteDamageManaAction<ActionT>(T weapon, ActionT source, Character targetCharacter) where ActionT : Action, Enchantment.IDamage, Enchantment.IManaCost {
+                return ExecuteDamageResourceAction(weapon.Character.Mana, source.ManaCost, source, targetCharacter);
+            }
+            protected static bool ExecuteDamageEnergyAction<ActionT>(T weapon, ActionT source, Character targetCharacter) where ActionT : Action, Enchantment.IDamage, Enchantment.IEnergyCost {
+                return ExecuteDamageResourceAction(weapon.Character.Energy, source.EnergyCost, source, targetCharacter);
             }
             #endregion
         }
