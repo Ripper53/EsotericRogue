@@ -5,33 +5,16 @@ using DungeonRogue.Boots;
 using DungeonRogue.Chestplates;
 using DungeonRogue.Sleeves;
 using DungeonRogue.Pants;
+using DungeonRogue.Helmets;
 
 namespace DungeonRogue.Units {
     public class OrcAIUnitBrain : AIUnitBrain, AIUnitBrain.IView, AIUnitBrain.IPathfinder {
         public HashSet<Vector2> View { get; set; }
         public LinkedList<Vector2> Path { get; set; }
 
-        private class OrcAICharacterBrain : ArsenalAICharacterBrain {
-
-            public override void Controls(Character enemyCharacter) {
-                Controls(this, enemyCharacter);
-            }
-        }
-
         public OrcAIUnitBrain() {
-            OrcAICharacterBrain characterBrain = new OrcAICharacterBrain();
-            new Unit(
-                new Character(
-                    10,
-                    characterBrain,
-                    new TreeHammerWeapon(),
-                    new HikerBoot(),
-                    new SteelChestplate(),
-                    new RubberSleeve(),
-                    new ClothPants()
-                ),
-                this
-            ) {
+            ArsenalAICharacterBrain characterBrain = new ArsenalAICharacterBrain();
+            new Unit(CharacterUtility.Create(10, characterBrain), this) {
                 Sprite = new Sprite("Ö")
             };
 
@@ -41,8 +24,16 @@ namespace DungeonRogue.Units {
             character.Stamina.Add(5);
             character.Stamina.Regen = 1;
 
+            character.Boot.BareItem.Speed = 2;
+            character.Chestplate.BareItem.PhysicalDefense = 10;
+            character.Pants.BareItem.PhysicalDefense = 5;
+
+            Weapon weapon = new TreeHammerWeapon();
+            character.Weapon.Equipped = weapon;
+            character.Inventory.AddItem(weapon);
+
             characterBrain.Arsenal = new Weapon[] {
-                character.Weapon.BareItem
+                weapon
             };
 
             dir = (Direction)rng.Next(4);

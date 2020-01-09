@@ -11,12 +11,9 @@ namespace EsotericRogue {
         public Menu() {
             options = new List<Option>();
 
-            OnSelected += OnSelected_Event;
-            OnDeselected += OnDeselected_Event;
+            OnSelected += source => WriteSelected();
+            OnDeselected += source => WriteUnselected(SelectedOptionIndex);
         }
-
-        private void OnSelected_Event(SelectableUI source) => WriteSelected();
-        private void OnDeselected_Event(SelectableUI source) => WriteUnselected(SelectedOptionIndex);
 
         public Option GetSelectedOption() {
             if (options != null && options.Count > 0)
@@ -28,6 +25,7 @@ namespace EsotericRogue {
             public IEnumerable<Sprite> Sprites;
             public delegate void OptionAction(Menu menu, Option option);
             public OptionAction Action;
+            public int Index { get; internal set; }
         }
 
         public void ClearOptions() {
@@ -48,6 +46,7 @@ namespace EsotericRogue {
         }
 
         public void AddOption(Option option) {
+            option.Index = options.Count;
             options.Add(option);
             if (Active) {
                 Clear();
@@ -56,6 +55,7 @@ namespace EsotericRogue {
         }
 
         public void SetOption(Option option, int index) {
+            option.Index = index;
             options[index] = option;
         }
 

@@ -30,6 +30,7 @@ namespace EsotericRogue {
 
         public readonly Equipment<Weapon> Weapon;
         public readonly Equipment<Boot> Boot;
+        public readonly Equipment<Helmet> Helmet;
         public readonly Equipment<Chestplate> Chestplate;
         public readonly Equipment<Sleeve> Sleeve;
         public readonly Equipment<Pants> Pants;
@@ -46,12 +47,13 @@ namespace EsotericRogue {
         /// <param name="bareWeapon">Cannot be null.</param>
         /// <param name="bareBoot">Cannot be null.</param>
         /// <param name="bareChestplate">Cannot be null.</param>
-        public Character(int health, CharacterBrain characterBrain, Weapon bareWeapon, Boot bareBoot, Chestplate bareChestplate, Sleeve bareSleeve, Pants barePants) : this(health) {
+        public Character(int health, CharacterBrain characterBrain, Weapon bareWeapon, Boot bareBoot, Helmet bareHelmet, Chestplate bareChestplate, Sleeve bareSleeve, Pants barePants) : this(health) {
             Brain = characterBrain;
             Brain.Character = this;
             enchantments = new List<Enchantment>();
             Weapon = new Equipment<Weapon>(this, bareWeapon);
             Boot = new Equipment<Boot>(this, bareBoot);
+            Helmet = new Equipment<Helmet>(this, bareHelmet);
             Chestplate = new Equipment<Chestplate>(this, bareChestplate);
             Sleeve = new Equipment<Sleeve>(this, bareSleeve);
             Pants = new Equipment<Pants>(this, barePants);

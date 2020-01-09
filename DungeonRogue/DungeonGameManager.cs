@@ -6,23 +6,19 @@ using DungeonRogue.Chestplates;
 using DungeonRogue.Sleeves;
 using DungeonRogue.Pants;
 using DungeonRogue.Ammunition;
+using DungeonRogue.Helmets;
 
 namespace DungeonRogue {
     public class DungeonGameManager : GameManager {
         public bool QuitGame { get; private set; }
 
         public DungeonGameManager() : base(
-            new Unit(new Character(10, new PlayerCharacterBrain(), new BareWeapon(), new BareBoot(), new BareChestplate(), new BareSleeve(), new BarePants()), new PlayerUnitBrain()) {
+            new Unit(new Character(10, new PlayerCharacterBrain(), new BareWeapon(), new BareBoot(), new BareHelmet(), new BareChestplate(), new BareSleeve(), new BarePants()), new PlayerUnitBrain()) {
                 Sprite = new Sprite("@", ConsoleColor.Magenta)
             }
         ) {
             PlayerInfo.Character.Stamina.IncreaseMax(5);
             PlayerInfo.Character.Stamina.Regen = 1;
-            PlayerInfo.Character.Inventory.AddItem(new WoodenBowWeapon());
-            for (int i = 0; i < 5; i++)
-                PlayerInfo.Character.Inventory.AddItem(new Arrow());
-
-            PlayerInfo.Character.Inventory.RemoveItems<Arrow>(1);
         }
 
         protected override bool Start() {

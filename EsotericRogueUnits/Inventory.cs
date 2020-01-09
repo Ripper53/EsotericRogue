@@ -17,8 +17,28 @@ namespace EsotericRogue {
         }
 
         private readonly List<Item> items;
-        public int Space;
-        public int TakenSpace { get; private set; }
+        public delegate void CapacityChangedAction(Inventory source, int capacity, int oldCapacity);
+        public event CapacityChangedAction CapacityChanged;
+        private int capacity;
+        public int Capacity {
+            get => capacity;
+            set {
+                int oldCapacity = capacity;
+                capacity = value;
+                CapacityChanged?.Invoke(this, capacity, oldCapacity);
+            }
+        }
+        public delegate void TakenSpaceChangedAction(Inventory source, int takenSpace, int oldTakenSpace);
+        public event TakenSpaceChangedAction TakenSpaceChanged;
+        private int takenSpace;
+        public int TakenSpace {
+            get => takenSpace;
+            set {
+                int oldTakenSpace = takenSpace;
+                takenSpace = value;
+                TakenSpaceChanged?.Invoke(this, takenSpace, oldTakenSpace);
+            }
+        }
         public int Count => items.Count;
         //public void Clear() => items.Clear();
 
@@ -26,8 +46,8 @@ namespace EsotericRogue {
             Character = character;
             gold = 0;
             items = new List<Item>();
-            Space = 30;
-            TakenSpace = 0;
+            capacity = 30;
+            takenSpace = 0;
         }
 
         public Item this[int index] => items[index];
@@ -44,7 +64,7 @@ namespace EsotericRogue {
 
         public bool AddItem(Item item) {
             int takenSpace = TakenSpace + item.Space;
-            if (takenSpace > Space || items.Contains(item)) return false;
+            if (takenSpace > Capacity || items.Contains(item)) return false;
             TakenSpace = takenSpace;
             if (item.Inventory != null)
                 item.Inventory.RemoveItem(item);

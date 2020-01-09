@@ -2,8 +2,7 @@
 
 namespace EsotericRogue {
     public abstract class Boot : EquippableItem {
-        public abstract int Speed { get; }
-        public override bool Consumable => false;
+        public int Speed { get; set; }
 
         protected override bool UseAction(Character character) {
             character.Boot.Equipped = this;

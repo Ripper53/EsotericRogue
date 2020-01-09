@@ -1,27 +1,15 @@
 ﻿using System.Collections.Generic;
 using EsotericRogue;
 using DungeonRogue.Weapons;
-using DungeonRogue.Boots;
-using DungeonRogue.Chestplates;
-using DungeonRogue.Sleeves;
-using DungeonRogue.Pants;
 
 namespace DungeonRogue.Units {
     public class BanditAIUnitBrain : AIUnitBrain, AIUnitBrain.IView, AIUnitBrain.IPathfinder {
         public HashSet<Vector2> View { get; set; }
         public LinkedList<Vector2> Path { get; set; }
 
-        private class BanditAICharacterBrain : ArsenalAICharacterBrain {
-
-            public override void Controls(Character enemyCharacter) {
-                Controls(this, enemyCharacter);
-            }
-        }
-
         public BanditAIUnitBrain() {
-            Weapon weapon = new SteelSwordWeapon();
-            BanditAICharacterBrain characterBrain = new BanditAICharacterBrain();
-            new Unit(new Character(3, characterBrain, weapon, new WolfFurBoot(), new WoodenChestplate(), new RubberSleeve(), new ClothPants()), this) {
+            ArsenalAICharacterBrain characterBrain = new ArsenalAICharacterBrain();
+            new Unit(CharacterUtility.Create(3, characterBrain), this) {
                 Sprite = new Sprite("ƃ")
             };
             Character character = Unit.Character;
@@ -29,10 +17,17 @@ namespace DungeonRogue.Units {
             character.Stamina.IncreaseMax(2);
             character.Stamina.Add(2);
             character.Stamina.Regen = 1;
+
+            character.Boot.BareItem.Speed = 2;
+
             character.Inventory.Gold = rng.Next(1, 6);
+            Weapon weapon = new SteelSwordWeapon();
+            character.Weapon.Equipped = weapon;
             character.Inventory.AddItem(weapon);
 
-            ArsenalAICharacterBrain.ArsenalConstructor(characterBrain);
+            characterBrain.Arsenal = new Weapon[] {
+                weapon
+            };
         }
 
         public override void Controls() {

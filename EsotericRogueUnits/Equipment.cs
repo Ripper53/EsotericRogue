@@ -9,11 +9,13 @@
             get => equipped;
             set {
                 T oldWeapon = equipped;
+                oldWeapon.OnUnequipped();
                 oldWeapon.Character = null;
                 if (value == null || value == equipped)
                     value = BareItem;
                 equipped = value;
                 equipped.Character = Character;
+                equipped.OnEquipped();
                 ItemEquipped?.Invoke(this, equipped, oldWeapon);
             }
         }

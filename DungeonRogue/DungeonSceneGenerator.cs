@@ -129,7 +129,7 @@ namespace DungeonRogue {
         private void SpawnFireTroll(Vector2 position) => Scene.SetUnit(new FireTrollAIUnitBrain().Unit, position);
 
         private void SpawnShop(Vector2 position) {
-            JadeAIUnitBrain unitBrain = new JadeAIUnitBrain();
+            JadeFriendlyAIUnitBrain unitBrain = new JadeFriendlyAIUnitBrain();
             Scene.SetUnit(unitBrain.Unit, position);
             Menu menu = ((FriendlyUnit)unitBrain.Unit).Menu;
             unitBrain.TalkSprite.Display = "I've got some items you might be interested in.";

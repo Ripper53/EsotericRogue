@@ -6,11 +6,12 @@ namespace EsotericRogue {
     public abstract class InventoryMenu : Menu {
         public readonly GameManager GameManager;
         public readonly Character Character;
-        private readonly Sprite nameSprite, goldSprite, spaceSprite;
+        private readonly Sprite nameSprite, goldSprite, capacitySprite;
         private readonly ItemsMenu<Item> itemsMenu;
         private readonly ItemsMenu<Potion> potionsMenu;
         private readonly ItemStorage<Weapon> weaponStorage;
         private readonly ItemStorage<Boot> bootStorage;
+        private readonly ItemStorage<Helmet> helmetStorage;
         private readonly ItemStorage<Chestplate> chestplateStorage;
         private readonly ItemStorage<Sleeve> sleeveStorage;
         private readonly ItemStorage<Pants> pantsStorage;
@@ -32,6 +33,7 @@ namespace EsotericRogue {
             public void ClearSelectedItem() {
                 Renderer.Display(Sprite.CreateEmptyUI(ClearLength), ClearItemPosition);
             }
+            public abstract void ClearItemOptions();
         }
         protected class ItemsMenu<T> : ItemsMenu where T : Item {
             private readonly InventoryMenu inventoryMenu;
@@ -70,23 +72,13 @@ namespace EsotericRogue {
                 if (ItemOptions.ContainsKey(key)) {
                     // Item already exists in inventory.
                     List<ItemOption> itemOptions = ItemOptions[key];
-                    Option option = null;
                     // Get already created option.
-                    foreach (ItemOption itemOption in itemOptions) {
-                        if (itemOption.Item.Name == key)
-                            option = itemOption.Option;
-                    }
-                    int optionIndex = 0;
-                    for (int i = 1, count = Options.Count; i < count; i++) {
-                        if (Options[i] == option)
-                            optionIndex = i;
-                    }
+                    Option option = itemOptions[0].Option;
                     sprite = itemOptions[0].Sprite;
                     itemOptions.Add(new ItemOption(item, option, sprite));
                     sprite.Display = GetItemName(item, itemOptions.Count);
-                    //option.Sprites = itemOptions[0].Option.Sprites;
                     if (Active)
-                        DisplayOption(optionIndex);
+                        DisplayOption(option.Index);
                 } else {
                     // This is a new item in the inventory.
                     Option option = new Option() {
@@ -94,10 +86,8 @@ namespace EsotericRogue {
                     };
                     sprite = Sprite.CreateUI(GetItemName(item));
                     ItemOptions.Add(key, new List<ItemOption>(1) { new ItemOption(item, option, sprite) });
-                    AddOption(option);
                     option.Sprites = new Sprite[] { sprite };
-                    if (Active)
-                        DisplayOption(Options.Count - 1);
+                    AddOption(option);
                 }
                 return sprite;
             }
@@ -121,7 +111,7 @@ namespace EsotericRogue {
                 }
             }
 
-            public void ClearItemOptions() => ItemOptions.Clear();
+            public override void ClearItemOptions() => ItemOptions.Clear();
         }
 
         private class ItemStorage<T> where T : EquippableItem {
@@ -193,7 +183,7 @@ namespace EsotericRogue {
         #endregion
 
         private Menu previousMenu;
-        private Vector2 MenuPosition => new Vector2(Position.x, Position.y + 10);
+        private Vector2 MenuPosition => new Vector2(Position.x, Position.y + 11);
         private void DisplayMenuEvent(Menu menu) {
             if (previousMenu != null) {
                 previousMenu.Clear();
@@ -214,23 +204,20 @@ namespace EsotericRogue {
             GameManager.PlayerInfo.Input.SelectedUIIndex = GameManager.GetSelectableUIIndex(this);
         }
 
+        private delegate void MenuClearAction();
         public InventoryMenu(GameManager gameManager, Character character) {
             GameManager = gameManager;
             Character = character;
             nameSprite = new Sprite(string.Empty);
             goldSprite = Sprite.CreateUI(string.Empty);
-            spaceSprite = Sprite.CreateUI(string.Empty);
-
-            Deactivated += menu => {
-                if (previousMenu != null)
-                    GameManager.RemoveUI(previousMenu);
-            };
+            capacitySprite = Sprite.CreateUI(string.Empty);
 
             const string
                 itemsTitle =       "Items       ",
                 potionsTitle =     "Potions     ",
                 weaponsTitle =     "Weapons     ",
                 bootsTitle =       "Boots       ",
+                helmetTitle =      "Helmets     ",
                 chestplatesTitle = "Chestplates ",
                 sleevesTitle =     "Sleeves     ",
                 pantsTitle =       "Pants       ";
@@ -239,8 +226,8 @@ namespace EsotericRogue {
                 new Sprite(" Inventory" + Environment.NewLine),
                 Sprite.CreateUI("Gold: "),
                 goldSprite,
-                Sprite.CreateUI(Environment.NewLine + "Space: "),
-                spaceSprite
+                Sprite.CreateUI(Environment.NewLine + "Capacity: "),
+                capacitySprite
             };
             itemsMenu = new ItemsMenu<Item>(this) {
                 Sprites = new Sprite[] {
@@ -252,11 +239,6 @@ namespace EsotericRogue {
                     new Sprite(potionsTitle + Environment.NewLine)
                 }
             };
-            weaponStorage = new ItemStorage<Weapon>(this, weaponsTitle, character.Weapon);
-            bootStorage = new ItemStorage<Boot>(this, bootsTitle, character.Boot);
-            chestplateStorage = new ItemStorage<Chestplate>(this, chestplatesTitle, character.Chestplate);
-            sleeveStorage = new ItemStorage<Sleeve>(this, sleevesTitle, character.Sleeve);
-            pantsStorage = new ItemStorage<Pants>(this, pantsTitle, character.Pants);
 
             Option closeOption = new Option() {
                 Sprites = new Sprite[] {
@@ -264,56 +246,41 @@ namespace EsotericRogue {
                 },
                 Action = CloseMenuEvent
             };
-            itemsMenu.AddOption(closeOption);
-            potionsMenu.AddOption(closeOption);
-            weaponStorage.Menu.AddOption(closeOption);
-            bootStorage.Menu.AddOption(closeOption);
-            chestplateStorage.Menu.AddOption(closeOption);
-            sleeveStorage.Menu.AddOption(closeOption);
-            pantsStorage.Menu.AddOption(closeOption);
+            MenuClearAction menuClear = null;
+            void AddToMenuClear(ItemsMenu menu) {
+                menuClear += () => {
+                    const int index = 1;
+                    if (menu.Options.Count > index)
+                        menu.RemoveRangeOptions(index, menu.Options.Count - index);
+                    menu.ClearItemOptions();
+                };
+            }
+            void AddOptionItemsMenu<T>(ItemsMenu<T> itemsMenu, string title) where T : Item {
+                itemsMenu.AddOption(closeOption);
+                AddToMenuClear(itemsMenu);
+                AddOption(new Option() {
+                    Sprites = new Sprite[] {
+                        Sprite.CreateUI(title)
+                    },
+                    Action = (menu, op) => DisplayMenuEvent(itemsMenu)
+                });
+            }
+            AddOptionItemsMenu(itemsMenu, itemsTitle);
+            AddOptionItemsMenu(potionsMenu, potionsTitle);
 
-            AddOption(new Option() {
-                Sprites = new Sprite[] {
-                    Sprite.CreateUI(itemsTitle)
-                },
-                Action = (menu, op) => DisplayMenuEvent(itemsMenu)
-            });
-            AddOption(new Option() {
-                Sprites = new Sprite[] {
-                    Sprite.CreateUI(potionsTitle)
-                },
-                Action = (menu, op) => DisplayMenuEvent(potionsMenu)
-            });
-            AddOption(new Option() {
-                Sprites = new Sprite[] {
-                    Sprite.CreateUI(weaponsTitle)
-                },
-                Action = (menu, op) => DisplayMenuEvent(weaponStorage.Menu)
-            });
-            AddOption(new Option() {
-                Sprites = new Sprite[] {
-                    Sprite.CreateUI(bootsTitle)
-                },
-                Action = (menu, op) => DisplayMenuEvent(bootStorage.Menu)
-            });
-            AddOption(new Option() {
-                Sprites = new Sprite[] {
-                    Sprite.CreateUI(chestplatesTitle)
-                },
-                Action = (menu, op) => DisplayMenuEvent(chestplateStorage.Menu)
-            });
-            AddOption(new Option() {
-                Sprites = new Sprite[] {
-                    Sprite.CreateUI(sleevesTitle)
-                },
-                Action = (menu, op) => DisplayMenuEvent(sleeveStorage.Menu)
-            });
-            AddOption(new Option() {
-                Sprites = new Sprite[] {
-                    Sprite.CreateUI(pantsTitle)
-                },
-                Action = (menu, op) => DisplayMenuEvent(pantsStorage.Menu)
-            });
+            ItemStorage<T> CreateItemStorage<T>(string title, Equipment<T> equipment) where T : EquippableItem {
+                ItemStorage<T> itemStorage = new ItemStorage<T>(this, title, equipment);
+                AddOptionItemsMenu(itemStorage.Menu, title);
+                AddToMenuClear(itemStorage.Menu);
+                return itemStorage;
+            }
+
+            weaponStorage = CreateItemStorage(weaponsTitle, Character.Weapon);
+            bootStorage = CreateItemStorage(bootsTitle, Character.Boot);
+            helmetStorage = CreateItemStorage(helmetTitle, Character.Helmet);
+            chestplateStorage = CreateItemStorage(chestplatesTitle, Character.Chestplate);
+            sleeveStorage = CreateItemStorage(sleevesTitle, Character.Sleeve);
+            pantsStorage = CreateItemStorage(pantsTitle, Character.Pants);
 
             Activated += source => {
                 Inventory inventory = Character.Inventory;
@@ -325,34 +292,23 @@ namespace EsotericRogue {
                 inventory.RemovedItem += Inventory_RemovedItem;
 
                 inventory.GoldChanged += Inventory_GoldChanged;
+                inventory.TakenSpaceChanged += Inventory_TakenSpaceChanged;
+                inventory.CapacityChanged += Inventory_TakenSpaceChanged;
             };
             Deactivated += source => {
-                static void MenuClear(Menu menu) {
-                    const int index = 1;
-                    if (menu.Options.Count > index)
-                        menu.RemoveRangeOptions(index, menu.Options.Count - index);
-                }
+                if (previousMenu != null)
+                    GameManager.RemoveUI(previousMenu);
+
                 // Clear inventory menu
-                MenuClear(itemsMenu);
-                MenuClear(potionsMenu);
-                MenuClear(weaponStorage.Menu);
-                MenuClear(bootStorage.Menu);
-                MenuClear(chestplateStorage.Menu);
-                MenuClear(sleeveStorage.Menu);
-                MenuClear(pantsStorage.Menu);
-                itemsMenu.ClearItemOptions();
-                potionsMenu.ClearItemOptions();
-                weaponStorage.Clear();
-                bootStorage.Clear();
-                chestplateStorage.Clear();
-                sleeveStorage.Clear();
-                pantsStorage.Clear();
+                menuClear();
 
                 Inventory inventory = Character.Inventory;
                 inventory.AddedItem -= AddOption;
                 inventory.RemovedItem -= Inventory_RemovedItem;
 
                 inventory.GoldChanged -= Inventory_GoldChanged;
+                inventory.TakenSpaceChanged -= Inventory_TakenSpaceChanged;
+                inventory.CapacityChanged -= Inventory_TakenSpaceChanged;
             };
         }
 
@@ -385,6 +341,8 @@ namespace EsotericRogue {
                 weaponStorage.AddOption(weapon);
             } else if (item is Boot boot) {
                 bootStorage.AddOption(boot);
+            } else if (item is Helmet helmet) {
+                helmetStorage.AddOption(helmet);
             } else if (item is Chestplate chestplate) {
                 chestplateStorage.AddOption(chestplate);
             } else if (item is Sleeve sleeve) {
@@ -402,6 +360,8 @@ namespace EsotericRogue {
                 weaponStorage.Remove(weapon);
             } else if (item is Boot boot) {
                 bootStorage.Remove(boot);
+            } else if (item is Helmet helmet) {
+                helmetStorage.Remove(helmet);
             } else if (item is Chestplate chestplate) {
                 chestplateStorage.Remove(chestplate);
             } else if (item is Sleeve sleeve) {
@@ -416,14 +376,23 @@ namespace EsotericRogue {
 
         private void Inventory_GoldChanged(Inventory source, int gold, int oldGold) {
             Vector2 pos = Position + new Vector2(6, 1);
-            Renderer.Display(Sprite.CreateEmptyUI(oldGold.ToString().Length), pos);
+            Renderer.Display(Sprite.CreateEmptyUI(goldSprite.Display.Length), pos);
             UpdateGoldSprite(gold);
             Renderer.Display(goldSprite, pos);
+        }
+        private void Inventory_TakenSpaceChanged(Inventory source, int takenSpace, int oldTakenSpace) {
+            Vector2 pos = Position + new Vector2(10, 2);
+            Renderer.Display(Sprite.CreateEmptyUI(capacitySprite.Display.Length), pos);
+            UpdateCapacitySprite(source.Capacity, takenSpace);
+            Renderer.Display(capacitySprite, pos);
         }
         #endregion
 
         private void UpdateGoldSprite(int gold) {
-            goldSprite.Display = GetContinuedString(gold.ToString(), maxWidth) + Environment.NewLine;
+            goldSprite.Display = GetContinuedString(gold.ToString(), maxWidth);
+        }
+        private void UpdateCapacitySprite(int capcity, int takenSpace) {
+            capacitySprite.Display = GetContinuedString($"{takenSpace}/{capcity}", maxWidth) + Environment.NewLine;
         }
 
         protected override void DisplayUI() {
@@ -435,6 +404,7 @@ namespace EsotericRogue {
             }
             nameSprite.Display = stringBuilder.ToString();
             UpdateGoldSprite(Character.Inventory.Gold);
+            UpdateCapacitySprite(Character.Inventory.Capacity, Character.Inventory.TakenSpace);
 
             itemsMenu.Position = MenuPosition;
             weaponStorage.Menu.Position = MenuPosition;

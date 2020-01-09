@@ -6,13 +6,13 @@ namespace DungeonRogue.Units {
     /// <summary>
     /// Travelling merchant.
     /// </summary>
-    public class JadeAIUnitBrain : FriendlyAIUnitBrain, AIUnitBrain.IView, AIUnitBrain.IPathfinder {
+    public class JadeFriendlyAIUnitBrain : FriendlyAIUnitBrain, AIUnitBrain.IView, AIUnitBrain.IPathfinder {
         public HashSet<Vector2> View { get; set; }
         public LinkedList<Vector2> Path { get; set; }
 
         public readonly Sprite TalkSprite;
 
-        public JadeAIUnitBrain() {
+        public JadeFriendlyAIUnitBrain() {
             TalkSprite = Sprite.CreateUI(string.Empty);
 
             FriendlyUnit friendlyUnit = new FriendlyUnit(new Character(1), this) {
