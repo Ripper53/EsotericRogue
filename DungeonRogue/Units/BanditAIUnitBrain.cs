@@ -9,7 +9,7 @@ namespace DungeonRogue.Units {
 
         public BanditAIUnitBrain() {
             ArsenalAICharacterBrain characterBrain = new ArsenalAICharacterBrain();
-            new Unit(CharacterUtility.Create(3, characterBrain), this) {
+            new MemoryUnit(CharacterUtility.Create(3, characterBrain), this) {
                 Sprite = new Sprite("ƃ")
             };
             Character character = Unit.Character;
@@ -20,7 +20,7 @@ namespace DungeonRogue.Units {
 
             character.Boot.BareItem.Speed = 2;
 
-            character.Inventory.Gold = rng.Next(1, 6);
+            character.Inventory.Gold = rng.GetInt(1, 6);
             Weapon weapon = new SteelSwordWeapon();
             character.Weapon.Equipped = weapon;
             character.Inventory.AddItem(weapon);
@@ -36,7 +36,7 @@ namespace DungeonRogue.Units {
         }
 
         private Vector2? target;
-        private void GetRandomTarget() => target = Scene.GroundPositions[rng.Next(Scene.GroundPositions.Count)];
+        private void GetRandomTarget() => target = Scene.GroundPositions[rng.GetInt(Scene.GroundPositions.Count)];
         public override void PreCalculate(GameManager gameManager) {
             if (!target.HasValue || Unit.Position == target) {
                 GetRandomTarget();

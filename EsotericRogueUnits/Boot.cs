@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace EsotericRogue {
     public abstract class Boot : EquippableItem {
@@ -16,6 +17,12 @@ namespace EsotericRogue {
             Character.RemainingDistance -= absDistance;
             Character.Distance += addDistance;
             return true;
+        }
+
+        public override IEnumerable<Sprite> GetDescription() {
+            return new Sprite[] {
+                Sprite.CreateUI("Speed: " + Speed)
+            };
         }
     }
 }

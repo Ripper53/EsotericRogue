@@ -1,4 +1,6 @@
-﻿namespace EsotericRogue {
+﻿using System.Collections.Generic;
+
+namespace EsotericRogue {
     public abstract class Item {
         /// <summary>
         /// Unique item name.
@@ -25,5 +27,6 @@
             return false;
         }
         protected abstract bool UseAction(Character character);
+        public abstract IEnumerable<Sprite> GetDescription();
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace EsotericRogue {
-    public class FriendlyUnit : Unit {
+    public class FriendlyUnit : MemoryUnit {
         public readonly Menu Menu;
 
         private GameManager gameManager;

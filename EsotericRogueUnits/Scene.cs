@@ -59,7 +59,8 @@ namespace EsotericRogue {
         public void SetTile(Tile tile, Vector2 position) {
             switch (tilesMap[position.x, position.y]) {
                 case Tile.Ground:
-                    groundPositions.Add(position);
+                    // If previous Tile was equal to ground, remove it because we are changing what it will be now.
+                    groundPositions.Remove(position);
                     break;
             }
             tilesMap[position.x, position.y] = tile;
@@ -78,6 +79,7 @@ namespace EsotericRogue {
         public void Reset() {
             units.Clear();
             unitsMap.Clear();
+            groundPositions.Clear();
             for (int y = 0; y < Size.y; y++) {
                 for (int x = 0; x < Size.x; x++) {
                     tilesMap[x, y] = Tile.Wall;

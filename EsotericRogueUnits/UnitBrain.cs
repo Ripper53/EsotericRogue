@@ -22,7 +22,7 @@ namespace EsotericRogue {
         private void ExecuteMoveUnitToPosition(Vector2 position) {
             IReadOnlyCollection<Unit> units = Scene.GetUnits(position);
             if (units != null) {
-                foreach (Unit unit in units) {
+                foreach (Unit unit in ArrayUtility.Copy(units)) {
                     if (!UnitCollision(unit))
                         return;
                 }

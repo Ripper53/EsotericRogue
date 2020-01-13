@@ -13,7 +13,7 @@ namespace DungeonRogue {
         public bool QuitGame { get; private set; }
 
         public DungeonGameManager() : base(
-            new Unit(new Character(10, new PlayerCharacterBrain(), new BareWeapon(), new BareBoot(), new BareHelmet(), new BareChestplate(), new BareSleeve(), new BarePants()), new PlayerUnitBrain()) {
+            new MemoryUnit(new Character(10, new PlayerCharacterBrain(), new BareWeapon(), new BareBoot(), new BareHelmet(), new BareChestplate(), new BareSleeve(), new BarePants()), new PlayerUnitBrain()) {
                 Sprite = new Sprite("@", ConsoleColor.Magenta)
             }
         ) {
@@ -132,7 +132,7 @@ namespace DungeonRogue {
             RemoveUI(mapSizeMenu);
 
             Renderer.Clear();
-            Renderer.Display(new Sprite("Enter Name:" + Environment.NewLine), new Vector2(0, 0));
+            Renderer.Display(new Sprite("Enter Name: "), new Vector2(0, 0));
             string name = Renderer.ReadLine();
             if (name == "")
                 name = "You";

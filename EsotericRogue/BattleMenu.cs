@@ -243,7 +243,7 @@ namespace EsotericRogue {
                     Position = new Vector2(0, 2)
                 },
                 toEnemyLootMenu = new LootInventoryMenu(GameManager, PlayerCharacter, character.Inventory) {
-                    Position = new Vector2(21, 2)
+                    Position = new Vector2(41, 2)
                 };
             Menu lootDoneMenu = new Menu() {
                 Sprites = new Sprite[] {

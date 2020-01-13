@@ -14,7 +14,7 @@ namespace DungeonRogue.Units {
 
         public OrcAIUnitBrain() {
             ArsenalAICharacterBrain characterBrain = new ArsenalAICharacterBrain();
-            new Unit(CharacterUtility.Create(10, characterBrain), this) {
+            new MemoryUnit(CharacterUtility.Create(10, characterBrain), this) {
                 Sprite = new Sprite("Ö")
             };
 
@@ -36,7 +36,7 @@ namespace DungeonRogue.Units {
                 weapon
             };
 
-            dir = (Direction)rng.Next(4);
+            dir = (Direction)rng.GetInt(4);
         }
 
         public override void Controls() {

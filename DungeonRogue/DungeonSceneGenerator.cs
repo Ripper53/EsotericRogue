@@ -15,7 +15,11 @@ namespace DungeonRogue {
         public int MinNumberOfRoom = 10, MaxNumberOfRoom = 20;
         public Vector2 MinRoomSize = new Vector2(2, 2), MaxRoomSize = new Vector2(10, 10);
 
-        public DungeonSceneGenerator(Scene scene) : base(scene) { }
+        private readonly NoteManager noteManager;
+
+        public DungeonSceneGenerator(Scene scene) : base(scene) {
+            noteManager = new NoteManager();
+        }
 
         private int dungeonNumber = 0;
         public override void Generate() {
@@ -116,10 +120,10 @@ namespace DungeonRogue {
                     break;
             }
 
-            for (int i = 0, spawnCount = spawnActions.Count; i < numberOfEnemies; i++) {
+            for (int i = 0; i < numberOfEnemies; i++) {
                 Vector2? position = getGroundPositionFunc();
                 if (position.HasValue)
-                    spawnActions[rng.Next(spawnCount)](position.Value);
+                    spawnActions[rng.Next(spawnActions.Count)](position.Value);
                 else
                     break;
             }
@@ -127,6 +131,7 @@ namespace DungeonRogue {
         private void SpawnBandit(Vector2 position) => Scene.SetUnit(new BanditAIUnitBrain().Unit, position);
         private void SpawnOrc(Vector2 position) => Scene.SetUnit(new OrcAIUnitBrain().Unit, position);
         private void SpawnFireTroll(Vector2 position) => Scene.SetUnit(new FireTrollAIUnitBrain().Unit, position);
+        private void SpawnYeti(Vector2 position) => Scene.SetUnit(new YetiAIUnitBrain().Unit, position);
 
         private void SpawnShop(Vector2 position) {
             JadeFriendlyAIUnitBrain unitBrain = new JadeFriendlyAIUnitBrain();

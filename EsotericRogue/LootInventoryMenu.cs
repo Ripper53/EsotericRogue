@@ -6,7 +6,7 @@
             this.toInventory = toInventory;
         }
 
-        protected override Option.OptionAction GetOptionAction<T>(ItemsMenu<T> itemsMenu, T item) {
+        protected override Menu.Option.OptionAction GetOptionAction<T>(ItemsMenu<T> itemsMenu, T item) {
             return (menu, op) => {
                 item = itemsMenu.ItemOptions[item.Name][0].Item;
                 Character.Inventory.RemoveItem(item);

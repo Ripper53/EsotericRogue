@@ -9,7 +9,7 @@ namespace DungeonRogue.Units {
 
         public FireTrollAIUnitBrain() {
             ArsenalAICharacterBrain characterBrain = new ArsenalAICharacterBrain();
-            new Unit(CharacterUtility.Create(30, characterBrain), this) {
+            new MemoryUnit(CharacterUtility.Create(30, characterBrain), this) {
                 Sprite = new Sprite("ŧ")
             };
 
@@ -19,7 +19,7 @@ namespace DungeonRogue.Units {
             character.Mana.Add(10);
             character.Mana.Regen = 1;
 
-            character.Inventory.Gold = rng.Next(20, 26);
+            character.Inventory.Gold = rng.GetInt(20, 26);
             Weapon weapon = new FireStaffWeapon();
             character.Weapon.Equipped = weapon;
             character.Inventory.AddItem(weapon);

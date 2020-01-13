@@ -6,7 +6,7 @@ namespace EsotericRogue {
     public abstract class InventoryMenu : Menu {
         public readonly GameManager GameManager;
         public readonly Character Character;
-        private readonly Sprite nameSprite, goldSprite, capacitySprite;
+        private readonly Sprite nameSprite, inventorySprite, goldSprite, capacitySprite;
         private readonly ItemsMenu<Item> itemsMenu;
         private readonly ItemsMenu<Potion> potionsMenu;
         private readonly ItemStorage<Weapon> weaponStorage;
@@ -15,6 +15,7 @@ namespace EsotericRogue {
         private readonly ItemStorage<Chestplate> chestplateStorage;
         private readonly ItemStorage<Sleeve> sleeveStorage;
         private readonly ItemStorage<Pants> pantsStorage;
+        private readonly TextUI DescriptionTextUI;
 
         private const int maxWidth = 20;
 
@@ -43,6 +44,7 @@ namespace EsotericRogue {
             public ItemsMenu(InventoryMenu inventoryMenu) {
                 ItemOptions = new Dictionary<string, List<ItemOption>>();
                 this.inventoryMenu = inventoryMenu;
+                SelectedOptionIndexChanged += (source, index, oldIndex) => this.inventoryMenu.InventoryMenu_SelectedOptionIndexChanged(this, index);
             }
 
             public class ItemOption {
@@ -81,7 +83,8 @@ namespace EsotericRogue {
                         DisplayOption(option.Index);
                 } else {
                     // This is a new item in the inventory.
-                    Option option = new Option() {
+                    Option option = new InventoryMenu.Option() {
+                        Item = item,
                         Action = inventoryMenu.GetOptionAction(this, item)
                     };
                     sprite = Sprite.CreateUI(GetItemName(item));
@@ -196,7 +199,7 @@ namespace EsotericRogue {
 
             GameManager.PlayerInfo.Input.SelectedUIIndex = GameManager.GetSelectableUIIndex(menu);
         }
-        private void CloseMenuEvent(Menu menu, Option op) {
+        private void CloseMenuEvent(Menu menu, Menu.Option option) {
             if (previousMenu == menu)
                 previousMenu = null;
             menu.Clear();
@@ -209,8 +212,10 @@ namespace EsotericRogue {
             GameManager = gameManager;
             Character = character;
             nameSprite = new Sprite(string.Empty);
+            inventorySprite = new Sprite(string.Empty);
             goldSprite = Sprite.CreateUI(string.Empty);
             capacitySprite = Sprite.CreateUI(string.Empty);
+            DescriptionTextUI = new TextUI();
 
             const string
                 itemsTitle =       "Items       ",
@@ -223,7 +228,7 @@ namespace EsotericRogue {
                 pantsTitle =       "Pants       ";
             Sprites = new Sprite[] {
                 nameSprite,
-                new Sprite(" Inventory" + Environment.NewLine),
+                inventorySprite,
                 Sprite.CreateUI("Gold: "),
                 goldSprite,
                 Sprite.CreateUI(Environment.NewLine + "Capacity: "),
@@ -240,7 +245,7 @@ namespace EsotericRogue {
                 }
             };
 
-            Option closeOption = new Option() {
+            Menu.Option closeOption = new Menu.Option() {
                 Sprites = new Sprite[] {
                     new Sprite("Close", ConsoleColor.Red, ConsoleColor.Black)
                 },
@@ -258,7 +263,7 @@ namespace EsotericRogue {
             void AddOptionItemsMenu<T>(ItemsMenu<T> itemsMenu, string title) where T : Item {
                 itemsMenu.AddOption(closeOption);
                 AddToMenuClear(itemsMenu);
-                AddOption(new Option() {
+                AddOption(new Menu.Option() {
                     Sprites = new Sprite[] {
                         Sprite.CreateUI(title)
                     },
@@ -334,6 +339,24 @@ namespace EsotericRogue {
         #endregion
 
         #region Events
+        public new class Option : Menu.Option {
+            public Item Item;
+
+            public IEnumerable<Sprite> GetDescription() {
+                return Item.GetDescription();
+            }
+        }
+
+        private void InventoryMenu_SelectedOptionIndexChanged(ItemsMenu itemsMenu, int selectedOptionIndex) {
+            DescriptionTextUI.Clear();
+            IReadOnlyList<Menu.Option> options = itemsMenu.Options;
+            if (selectedOptionIndex >= options.Count || selectedOptionIndex < 0) return;
+            Menu.Option menuOption = options[selectedOptionIndex];
+            if (!(menuOption is Option option)) return;
+            DescriptionTextUI.Sprites = option.GetDescription();
+            DescriptionTextUI.Display();
+        }
+
         private void AddOption(Inventory inventory, Item item) {
             if (item is Potion potion) {
                 potionsMenu.AddOption(potion);
@@ -403,12 +426,16 @@ namespace EsotericRogue {
                 stringBuilder.Append('s');
             }
             nameSprite.Display = stringBuilder.ToString();
+            inventorySprite.Display = " Inventory".PadRight(maxWidth - 10 - nameSprite.Display.Length) + Environment.NewLine;
             UpdateGoldSprite(Character.Inventory.Gold);
             UpdateCapacitySprite(Character.Inventory.Capacity, Character.Inventory.TakenSpace);
 
             itemsMenu.Position = MenuPosition;
             weaponStorage.Menu.Position = MenuPosition;
             potionsMenu.Position = MenuPosition;
+
+            DescriptionTextUI.Position = Position + new Vector2(maxWidth, 0);
+            //DescriptionTextUI.Display();
 
             base.DisplayUI();
         }

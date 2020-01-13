@@ -27,7 +27,7 @@ namespace DungeonRogue.Units {
 
         public YetiAIUnitBrain() {
             ArsenalAICharacterBrain characterBrain = new ArsenalAICharacterBrain();
-            new Unit(CharacterUtility.Create(20, characterBrain), this) {
+            new MemoryUnit(CharacterUtility.Create(20, characterBrain), this) {
                 Sprite = new Sprite("Ÿ")
             };
 

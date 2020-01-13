@@ -70,6 +70,16 @@ namespace EsotericRogue {
 
         public abstract bool Use(int index, Character targetCharacter);
 
+        public override IEnumerable<Sprite> GetDescription() {
+            List<Sprite> sprites = new List<Sprite>();
+            Sprite newLineSprite = new Sprite(Environment.NewLine);
+            foreach (Action action in Actions) {
+                sprites.AddRange(action.GetDescription());
+                sprites.Add(newLineSprite);
+            }
+            return sprites;
+        }
+
         public IEnumerator<Action> GetEnumerator() {
             return Actions.GetEnumerator();
         }

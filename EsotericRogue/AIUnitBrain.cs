@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EsotericRogue {
     public abstract class AIUnitBrain : UnitBrain {
-        protected static readonly Random rng = new Random();
+        protected static readonly RNGMemory rng = new RNGMemory();
 
         protected override bool UnitCollision(Unit unit) {
             if (unit.Brain is PlayerUnitBrain p) {

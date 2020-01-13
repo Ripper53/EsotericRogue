@@ -108,12 +108,11 @@ namespace EsotericRogue {
                                 } else {
                                     // If Player moved to free spot.
                                     brain.UpdateView();
-                                    List<Unit> allUnits = new List<Unit>(Scene.Units);
-                                    List<Task> tasks = new List<Task>(allUnits.Count);
+                                    Unit[] allUnits = ArrayUtility.Copy(Scene.Units);
+                                    List<Task> tasks = new List<Task>(allUnits.Length);
                                     foreach (Unit unit in allUnits) {
-                                        if (unit.Brain is AIUnitBrain aiBrain) {
+                                        if (unit.Brain is AIUnitBrain aiBrain)
                                             tasks.Add(Task.Run(() => aiBrain.PreCalculate(this)));
-                                        }
                                     }
                                     Task.WaitAll(tasks.ToArray());
                                     foreach (Unit unit in allUnits) {
@@ -121,6 +120,8 @@ namespace EsotericRogue {
                                         // If Unit has a brain and it is not the Player's brain, execute controls.
                                         if (unit.Brain != null && unit.Brain != brain)
                                             unit.Brain.Controls();
+                                        if (unit is MemoryUnit memoryUnit)
+                                            memoryUnit.allPositions.Add(unit.Position);
                                     }
                                     // Display any units in view!
                                     foreach (Unit unit in Scene.Units) {

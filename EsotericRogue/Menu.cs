@@ -6,7 +6,17 @@ namespace EsotericRogue {
         public IEnumerable<Sprite> Sprites;
         private readonly List<Option> options;
         public IReadOnlyList<Option> Options => options;
-        public int SelectedOptionIndex { get; private set; }
+        public delegate void SelectedOptionIndexChangedAction(Menu source, int selectedOptionIndex, int oldSelectedOptionIndex);
+        public event SelectedOptionIndexChangedAction SelectedOptionIndexChanged;
+        private int selectedOptionIndex;
+        public int SelectedOptionIndex {
+            get => selectedOptionIndex;
+            set {
+                int oldSelectedOptionIndex = selectedOptionIndex;
+                selectedOptionIndex = value;
+                SelectedOptionIndexChanged?.Invoke(this, selectedOptionIndex, oldSelectedOptionIndex);
+            }
+        }
 
         public Menu() {
             options = new List<Option>();
