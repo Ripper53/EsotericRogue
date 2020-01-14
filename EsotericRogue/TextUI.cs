@@ -8,14 +8,12 @@ namespace EsotericRogue {
         public int Width = 10;
         public int MaxLength = 100;
 
-        private int widthCount;
-        private string WordWrap(string text) {
+        private string WordWrap(string text, ref int widthCount) {
             string[] lines = text.Split(Environment.NewLine);
-            int resultCount = 0;
-            for (int i = 0; i < lines.Length; i++) {
+            StringBuilder stringBuilder = new StringBuilder(text.Length);
+            for (int i = 0, count = lines.Length; i < count; i++) {
                 string line = lines[i];
                 string[] words = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                StringBuilder stringBuilder = new StringBuilder(text.Length + words.Length);
                 foreach (string word in words) {
                     stringBuilder.Append(word);
                     stringBuilder.Append(' ');
@@ -25,21 +23,23 @@ namespace EsotericRogue {
                         stringBuilder.Append(Environment.NewLine);
                     }
                 }
+                if (count > 1) {
+                    widthCount = 0;
+                    stringBuilder.Append(Environment.NewLine);
+                }
                 lines[i] = stringBuilder.ToString();
-                resultCount += lines[i].Length;
+                stringBuilder.Clear();
             }
-            StringBuilder result = new StringBuilder(resultCount);
             foreach (string line in lines)
-                result.Append(line);
-            return result.ToString();
+                stringBuilder.Append(line);
+            return stringBuilder.ToString();
         }
 
         protected override void DisplayUI() {
             if (Sprites != null) {
-                widthCount = 0;
-                int characterCount = 0;
+                int characterCount = 0, widthCount = 0;
                 foreach (Sprite sprite in Sprites) {
-                    Sprite wrappedSprite = new Sprite(WordWrap(sprite.Display), sprite.Foreground, sprite.Background);
+                    Sprite wrappedSprite = new Sprite(WordWrap(sprite.Display, ref widthCount), sprite.Foreground, sprite.Background);
                     int thisCharacterCount = wrappedSprite.Display.Length;
                     characterCount += thisCharacterCount;
                     if (characterCount > MaxLength) {

@@ -17,9 +17,9 @@ namespace EsotericRogue {
         private readonly ItemStorage<Pants> pantsStorage;
         private readonly TextUI DescriptionTextUI;
 
-        private const int maxWidth = 20;
+        public int Width = 20;
 
-        protected abstract Option.OptionAction GetOptionAction<T>(ItemsMenu<T> itemsMenu, T item) where T : Item;
+        protected abstract Menu.Option.OptionAction GetOptionAction<T>(ItemsMenu<T> itemsMenu, T item) where T : Item;
 
         #region Classes
         protected abstract class ItemsMenu : Menu {
@@ -38,10 +38,17 @@ namespace EsotericRogue {
         }
         protected class ItemsMenu<T> : ItemsMenu where T : Item {
             private readonly InventoryMenu inventoryMenu;
+            public readonly Sprite TitleSprite;
+            public readonly string Title;
             public readonly Dictionary<string, List<ItemOption>> ItemOptions;
             public int Count(T item) => ItemOptions[item.Name].Count;
 
-            public ItemsMenu(InventoryMenu inventoryMenu) {
+            public ItemsMenu(InventoryMenu inventoryMenu, string title) {
+                Title = title;
+                TitleSprite = new Sprite(title);
+                Sprites = new Sprite[] {
+                    TitleSprite
+                };
                 ItemOptions = new Dictionary<string, List<ItemOption>>();
                 this.inventoryMenu = inventoryMenu;
                 SelectedOptionIndexChanged += (source, index, oldIndex) => this.inventoryMenu.InventoryMenu_SelectedOptionIndexChanged(this, index);
@@ -78,7 +85,7 @@ namespace EsotericRogue {
                     Option option = itemOptions[0].Option;
                     sprite = itemOptions[0].Sprite;
                     itemOptions.Add(new ItemOption(item, option, sprite));
-                    sprite.Display = GetItemName(item, itemOptions.Count);
+                    sprite.Display = inventoryMenu.GetItemName(item, itemOptions.Count);
                     if (Active)
                         DisplayOption(option.Index);
                 } else {
@@ -87,7 +94,7 @@ namespace EsotericRogue {
                         Item = item,
                         Action = inventoryMenu.GetOptionAction(this, item)
                     };
-                    sprite = Sprite.CreateUI(GetItemName(item));
+                    sprite = Sprite.CreateUI(inventoryMenu.GetItemName(item));
                     ItemOptions.Add(key, new List<ItemOption>(1) { new ItemOption(item, option, sprite) });
                     option.Sprites = new Sprite[] { sprite };
                     AddOption(option);
@@ -99,7 +106,7 @@ namespace EsotericRogue {
                 List<ItemOption> itemOptions = ItemOptions[key];
                 if (itemOptions.Count > 1) {
                     itemOptions.RemoveAt(itemOptions.FindIndex(v => v.Item == item));
-                    itemOptions[0].Sprite.Display = GetItemName(item, itemOptions.Count);
+                    itemOptions[0].Sprite.Display = inventoryMenu.GetItemName(item, itemOptions.Count);
                 } else {
                     ItemOptions.Remove(key);
                     RemoveOption(itemOptions[0].Option);
@@ -113,11 +120,16 @@ namespace EsotericRogue {
                     }
                 }
             }
+            protected override void DisplayUI() {
+                TitleSprite.Display = Title.PadRight(inventoryMenu.Width) + Environment.NewLine;
+                base.DisplayUI();
+            }
 
             public override void ClearItemOptions() => ItemOptions.Clear();
         }
 
         private class ItemStorage<T> where T : EquippableItem {
+            private readonly InventoryMenu inventoryMenu;
             private readonly Dictionary<T, ItemUI> dict;
             public readonly ItemsMenu<T> Menu;
 
@@ -125,14 +137,11 @@ namespace EsotericRogue {
 
             public ItemStorage(InventoryMenu inventoryMenu, string name, Equipment<T> equipment) {
                 dict = new Dictionary<T, ItemUI>();
-                Menu = new ItemsMenu<T>(inventoryMenu) {
-                    Sprites = new Sprite[] {
-                        new Sprite(name + Environment.NewLine)
-                    }
-                };
+                Menu = new ItemsMenu<T>(inventoryMenu, name);
                 this.equipment = equipment;
-                inventoryMenu.Activated += menu => this.equipment.ItemEquipped += ItemEquippedAction;
-                inventoryMenu.Deactivated += menu => this.equipment.ItemEquipped -= ItemEquippedAction;
+                this.inventoryMenu = inventoryMenu;
+                this.inventoryMenu.Activated += menu => this.equipment.ItemEquipped += ItemEquippedAction;
+                this.inventoryMenu.Deactivated += menu => this.equipment.ItemEquipped -= ItemEquippedAction;
             }
 
             private class ItemUI {
@@ -143,14 +152,14 @@ namespace EsotericRogue {
             }
 
             private void SetEquippedSprite(Sprite sprite, T equippableItem) {
-                sprite.Display = GetPrefixedItemName(equippableItem, "E", Menu.Count(equippableItem));
+                sprite.Display = inventoryMenu.GetPrefixedItemName(equippableItem, "E", Menu.Count(equippableItem));
                 Menu.ClearLength = sprite.Display.Length;
             }
             private void ItemEquippedAction(Equipment<T> source, T item, T oldItem) {
                 if (dict.ContainsKey(oldItem)) {
                     ItemUI storedOldItem = dict[oldItem];
                     Menu.ClearSelectedItem();
-                    storedOldItem.Sprite.Display = GetItemName(oldItem, Menu.Count(oldItem));
+                    storedOldItem.Sprite.Display = inventoryMenu.GetItemName(oldItem, Menu.Count(oldItem));
                     Renderer.Display(storedOldItem.Sprite, Menu.ClearItemPosition);
                 }
                 if (dict.ContainsKey(item)) {
@@ -163,7 +172,6 @@ namespace EsotericRogue {
 
             public void Clear() {
                 dict.Clear();
-                Menu.ClearItemOptions();
             }
 
             public void AddOption(T equippableItem) {
@@ -234,16 +242,8 @@ namespace EsotericRogue {
                 Sprite.CreateUI(Environment.NewLine + "Capacity: "),
                 capacitySprite
             };
-            itemsMenu = new ItemsMenu<Item>(this) {
-                Sprites = new Sprite[] {
-                    new Sprite(itemsTitle + Environment.NewLine)
-                }
-            };
-            potionsMenu = new ItemsMenu<Potion>(this) {
-                Sprites = new Sprite[] {
-                    new Sprite(potionsTitle + Environment.NewLine)
-                }
-            };
+            itemsMenu = new ItemsMenu<Item>(this, itemsTitle);
+            potionsMenu = new ItemsMenu<Potion>(this, potionsTitle);
 
             Menu.Option closeOption = new Menu.Option() {
                 Sprites = new Sprite[] {
@@ -277,6 +277,7 @@ namespace EsotericRogue {
                 ItemStorage<T> itemStorage = new ItemStorage<T>(this, title, equipment);
                 AddOptionItemsMenu(itemStorage.Menu, title);
                 AddToMenuClear(itemStorage.Menu);
+                menuClear += () => itemStorage.Clear();
                 return itemStorage;
             }
 
@@ -318,23 +319,23 @@ namespace EsotericRogue {
         }
 
         #region Get Names
-        private static string GetItemName(Item item, int count) {
+        private string GetItemName(Item item, int count) {
             if (count > 1) {
                 string countStr = count.ToString();
-                return $"{GetContinuedString(item.Name, maxWidth - countStr.Length - 2)} x{countStr}";
+                return $"{GetContinuedString(item.Name, Width - countStr.Length - 2)} x{countStr}";
             } else
                 return GetItemName(item);
         }
-        private static string GetItemName(Item item) {
-            return GetContinuedString(item.Name, maxWidth);
+        private string GetItemName(Item item) {
+            return GetContinuedString(item.Name, Width);
         }
-        private static string GetPrefixedItemName(Item item, string prefix, int count) {
+        private string GetPrefixedItemName(Item item, string prefix, int count) {
             string str = $"[{prefix}]{item.Name}";
             if (count > 1) {
                 string countStr = count.ToString();
-                return $"{GetContinuedString(str, maxWidth - countStr.Length - 2)} x{countStr}";
+                return $"{GetContinuedString(str, Width - countStr.Length - 2)} x{countStr}";
             } else
-                return GetContinuedString(str, maxWidth);
+                return GetContinuedString(str, Width);
         }
         #endregion
 
@@ -412,21 +413,21 @@ namespace EsotericRogue {
         #endregion
 
         private void UpdateGoldSprite(int gold) {
-            goldSprite.Display = GetContinuedString(gold.ToString(), maxWidth);
+            goldSprite.Display = GetContinuedString(gold.ToString(), Width);
         }
         private void UpdateCapacitySprite(int capcity, int takenSpace) {
-            capacitySprite.Display = GetContinuedString($"{takenSpace}/{capcity}", maxWidth) + Environment.NewLine;
+            capacitySprite.Display = GetContinuedString($"{takenSpace}/{capcity}", Width) + Environment.NewLine;
         }
 
         protected override void DisplayUI() {
-            string name = GetContinuedString(Character.Name, maxWidth);
+            string name = GetContinuedString(Character.Name, Width);
             StringBuilder stringBuilder = new StringBuilder(name, name.Length + 2);
             stringBuilder.Append('\'');
             if (!Character.Name.EndsWith('s')) {
                 stringBuilder.Append('s');
             }
             nameSprite.Display = stringBuilder.ToString();
-            inventorySprite.Display = " Inventory".PadRight(maxWidth - 10 - nameSprite.Display.Length) + Environment.NewLine;
+            inventorySprite.Display = " Inventory".PadRight(Width - nameSprite.Display.Length) + Environment.NewLine;
             UpdateGoldSprite(Character.Inventory.Gold);
             UpdateCapacitySprite(Character.Inventory.Capacity, Character.Inventory.TakenSpace);
 
@@ -434,8 +435,7 @@ namespace EsotericRogue {
             weaponStorage.Menu.Position = MenuPosition;
             potionsMenu.Position = MenuPosition;
 
-            DescriptionTextUI.Position = Position + new Vector2(maxWidth, 0);
-            //DescriptionTextUI.Display();
+            DescriptionTextUI.Position = Position + new Vector2(Width, 0);
 
             base.DisplayUI();
         }

@@ -259,8 +259,6 @@ namespace EsotericRogue {
             });
             GameManager.AddUI(toPlayerLootMenu);
             GameManager.AddUI(toEnemyLootMenu);
-            GameManager.RemoveUI(toEnemyLootMenu);
-            GameManager.AddUI(toEnemyLootMenu);
             GameManager.AddUI(lootDoneMenu);
             PlayerInfo.Input.SelectedUIIndex = 0;
 

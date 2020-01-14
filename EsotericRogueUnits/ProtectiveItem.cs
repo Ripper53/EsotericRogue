@@ -9,9 +9,9 @@ namespace EsotericRogue {
 
         public override IEnumerable<Sprite> GetDescription() {
             return new Sprite[] {
-                new Sprite("PD: " + PhysicalDefense + Environment.NewLine, Weapon.GetDamageColor(DamageType.Physical)),
-                new Sprite("MD: " + MagicalDefense + Environment.NewLine, Weapon.GetDamageColor(DamageType.Magical)),
-                new Sprite("ED: " + ElectricalDefense, Weapon.GetDamageColor(DamageType.Electrical))
+                new Sprite("PD: " + PhysicalDefense + Environment.NewLine, Weapon.GetDamageColor(DamageType.Physical), ConsoleColor.Black),
+                new Sprite("MD: " + MagicalDefense + Environment.NewLine, Weapon.GetDamageColor(DamageType.Magical), ConsoleColor.Black),
+                new Sprite("ED: " + ElectricalDefense, Weapon.GetDamageColor(DamageType.Electrical), ConsoleColor.Black)
             };
         }
     }

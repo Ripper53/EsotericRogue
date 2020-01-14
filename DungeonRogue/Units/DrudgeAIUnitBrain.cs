@@ -11,6 +11,13 @@ namespace DungeonRogue.Units {
             new MemoryUnit(CharacterUtility.Create(50, characterBrain), this) {
                 Sprite = new Sprite("Ɗ")
             };
+
+            Character character = Unit.Character;
+            character.Stamina.IncreaseMax(20);
+            character.Stamina.Add(20);
+            character.Stamina.Regen = 3;
+
+
         }
 
         public override void Controls() {

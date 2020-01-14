@@ -19,6 +19,8 @@ namespace DungeonRogue {
         ) {
             PlayerInfo.Character.Stamina.IncreaseMax(5);
             PlayerInfo.Character.Stamina.Regen = 1;
+
+            PlayerInfo.Character.Inventory.AddItem(new SteelChestplate());
         }
 
         protected override bool Start() {
