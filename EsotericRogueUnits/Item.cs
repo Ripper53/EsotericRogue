@@ -1,6 +1,16 @@
 ﻿using System.Collections.Generic;
 
 namespace EsotericRogue {
+    public enum Rarity {
+        Unique,
+        Common,
+        Uncommon,
+        Rare,
+        Extraordinary,
+        Epic,
+        Legendary,
+        Galactic
+    };
     public abstract class Item {
         /// <summary>
         /// Unique item name.
@@ -15,6 +25,7 @@ namespace EsotericRogue {
         /// Added inventory.
         /// </summary>
         public Inventory Inventory { get; internal set; }
+        public Rarity Rarity = Rarity.Common;
 
         public bool Use(Character character) {
             if (UseAction(character)) {

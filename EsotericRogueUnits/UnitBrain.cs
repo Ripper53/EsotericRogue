@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 
 namespace EsotericRogue {
-    public abstract class UnitBrain {
+    public abstract class UnitBrain : IScene, IPosition {
         public Unit Unit { get; internal set; }
         public Scene Scene { get; internal set; }
+        public Vector2 Position => Unit.Position;
 
         public abstract void Controls();
 

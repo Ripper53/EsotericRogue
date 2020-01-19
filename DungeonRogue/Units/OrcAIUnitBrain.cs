@@ -61,7 +61,7 @@ namespace DungeonRogue.Units {
             }
 
             if (target.HasValue && target != Unit.Position)
-                FindAStarPath(this, target.Value);
+                IPathfinder.FindAStarPath(this, target.Value);
             else {
                 target = null;
                 switch (dir) {

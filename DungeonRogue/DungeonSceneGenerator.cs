@@ -108,6 +108,15 @@ namespace DungeonRogue {
             if (numberOfEnemies > 20)
                 numberOfEnemies = rng.Next(2, 21);
 
+            bool Spawn(SpawnAction spawnAction) {
+                Vector2? position = getGroundPositionFunc();
+                if (position.HasValue) {
+                    spawnAction(position.Value);
+                    return true;
+                }
+                return false;
+            }
+
             switch (dungeonNumber) {
                 case 2:
                     spawnActions.Add(SpawnOrc);
@@ -115,17 +124,18 @@ namespace DungeonRogue {
                 case 3:
                     spawnActions.Add(SpawnFireTroll);
                     break;
+                case 18:
+                    Spawn(SpawnLostGroup);
+                    break;
                 default:
                     spawnActions.Add(SpawnBandit);
+                    spawnActions.Add(SpawnLostGroup);
                     break;
             }
 
             for (int i = 0; i < numberOfEnemies; i++) {
-                Vector2? position = getGroundPositionFunc();
-                if (position.HasValue)
-                    spawnActions[rng.Next(spawnActions.Count)](position.Value);
-                else
-                    break;
+                if (!Spawn(spawnActions[rng.Next(spawnActions.Count)]))
+                    return;
             }
         }
         private void SpawnBandit(Vector2 position) => Scene.SetUnit(new BanditAIUnitBrain().Unit, position);
@@ -152,9 +162,59 @@ namespace DungeonRogue {
                 });
             }
 
+            if (gold > 10) {
+                AddItem(new ChainChestplate(), 20);
+            }
             if (gold >= 0) {
                 AddItem(new ClothPants(), 10);
             }
+        }
+
+        private class LostGroupData {
+            public readonly FriendlyUnit FriendlyUnit;
+            public FriendlyUnit.InteractedAction InteractedAction;
+
+            public LostGroupData(FriendlyUnit friendlyUnit, FriendlyUnit.InteractedAction interactedAction) {
+                FriendlyUnit = friendlyUnit;
+                InteractedAction = interactedAction;
+            }
+        }
+        private void SpawnLostGroup(Vector2 position) {
+            spawnActions.Remove(SpawnLostGroup);
+            YuniGroupAIUnitBrain.YuniAIUnitGroup group = new YuniGroupAIUnitBrain.YuniAIUnitGroup(position);
+            List<LostGroupData> allInteractActions = new List<LostGroupData>(4);
+            YuniGroupAIUnitBrain GetUnitBrain(Vector2 originPosition, string talk) {
+                YuniGroupAIUnitBrain unitBrain = new YuniGroupAIUnitBrain(group);
+                group.Add(unitBrain, originPosition);
+                Scene.SetUnit(unitBrain.Unit, position);
+                Sprite talkSprite = Sprite.CreateUI("Be very careful! There lurks the Drudge below the twentieth floor." + Environment.NewLine);
+                talk += Environment.NewLine;
+                FriendlyUnit unit = (FriendlyUnit)unitBrain.Unit;
+                LostGroupData lostGroupData = null;
+                void InteractEvent(FriendlyUnit friendlyUnit, PlayerUnitBrain playerUnitBrain) {
+                    talkSprite.Display = talk;
+                    if (playerUnitBrain != null) {
+                        // If playerUnitBrain is not null, that means this collision is genuine.
+                        // Loop through all actions and execute them for all others in the group.
+                        allInteractActions.Remove(lostGroupData);
+                        foreach (LostGroupData action in allInteractActions)
+                            action.InteractedAction(action.FriendlyUnit, null);
+                    }
+                    friendlyUnit.Interacted -= InteractEvent;
+                }
+                lostGroupData = new LostGroupData(unit, InteractEvent);
+                allInteractActions.Add(lostGroupData);
+                unit.Interacted += InteractEvent;
+                unit.Menu.Sprites = new Sprite[] {
+                    talkSprite
+                };
+                return unitBrain;
+            }
+            YuniGroupAIUnitBrain
+                unitBrain0 = GetUnitBrain(new Vector2(0, 1), "I can't believe Yuni is dead."),
+                unitBrain1 = GetUnitBrain(new Vector2(1, 0), "Watch out for the Drudge."),
+                unitBrain2 = GetUnitBrain(new Vector2(0, -1), "I want to get outta here now."),
+                unitBrain3 = GetUnitBrain(new Vector2(-1, 0), "We couldn't recover Yuni's body.");
         }
         #endregion
 

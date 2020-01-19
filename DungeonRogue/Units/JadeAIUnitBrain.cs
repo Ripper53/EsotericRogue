@@ -30,9 +30,7 @@ namespace DungeonRogue.Units {
 
         public override void Controls() {
             if (collidedWithPlayer) return;
-            if (Path != null && Path.First.Next != null) {
-                Move(Path.First.Next.Value);
-            }
+            MoveToPath(this);
         }
 
         private bool collidedWithPlayer = false;
@@ -41,7 +39,7 @@ namespace DungeonRogue.Units {
             CastViewBrain.CastView(this, 0);
             Vector2 playerPos = gameManager.PlayerInfo.Unit.Position;
             if (View.Contains(playerPos)) {
-                FindAStarPath(this, playerPos);
+                IPathfinder.FindAStarPath(this, playerPos);
             } else {
                 Path = null;
             }

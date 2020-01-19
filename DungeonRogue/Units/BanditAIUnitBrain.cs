@@ -28,28 +28,24 @@ namespace DungeonRogue.Units {
             characterBrain.Arsenal = new Weapon[] {
                 weapon
             };
+
+            randomPositionGetter = new RandomPositionGetter<BanditAIUnitBrain>(this);
         }
 
         public override void Controls() {
-            if (Path != null && Path.First.Next != null)
-                Move(Path.First.Next.Value);
+            MoveToPath(this);
         }
 
-        private Vector2? target;
-        private void GetRandomTarget() => target = Scene.GroundPositions[rng.GetInt(Scene.GroundPositions.Count)];
+        private readonly RandomPositionGetter<BanditAIUnitBrain> randomPositionGetter;
         public override void PreCalculate(GameManager gameManager) {
-            if (!target.HasValue || Unit.Position == target) {
-                GetRandomTarget();
-            }
-
             CastViewBrain.CastView(this, 0);
-            Vector2 playerPos = gameManager.PlayerInfo.Unit.Position;
+            Vector2 playerPos = gameManager.PlayerInfo.Unit.Position, target;
             if (View.Contains(playerPos)) {
                 target = playerPos;
+            } else {
+                target = randomPositionGetter.GetTarget();
             }
-            FindAStarPath(this, target.Value);
-            if (Path == null)
-                GetRandomTarget();
+            IPathfinder.FindAStarPath(this, target);
         }
     }
 }

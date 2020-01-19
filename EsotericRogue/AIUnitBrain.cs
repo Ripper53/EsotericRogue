@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace EsotericRogue {
     public abstract class AIUnitBrain : UnitBrain {
@@ -20,12 +19,17 @@ namespace EsotericRogue {
         }
         public interface IPathfinder {
             LinkedList<Vector2> Path { get; set; }
+
+            public static void FindAStarPath<T>(T ai, Vector2 end) where T : AIUnitBrain, IPathfinder {
+                ai.Path = AStarPathfinderUtility.FindAStarPath(ai, end);
+            }
         }
 
         #region Static
-        private static readonly AStarPathfinder aStarPathfinder = new AStarPathfinder();
-        protected static void FindAStarPath<T>(T ai, Vector2 end) where T : AIUnitBrain, IPathfinder {
-            ai.Path = aStarPathfinder.FindPath(ai.Scene, ai.Unit.Position, end);
+        protected static void MoveToPath<T>(T ai) where T : AIUnitBrain, IPathfinder {
+            if (ai.Path != null && ai.Path.First.Next != null) {
+                ai.Move(ai.Path.First.Next.Value);
+            }
         }
         #endregion
     }

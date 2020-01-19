@@ -81,6 +81,11 @@ namespace EsotericRogue {
             toBattle.Enqueue(brain.Unit.Character);
         }
 
+        private readonly Queue<FriendlyUnit> toInteract = new Queue<FriendlyUnit>();
+        public void Interact(FriendlyUnit friendlyUnit) {
+            toInteract.Enqueue(friendlyUnit);
+        }
+
         public void Run() {
             Renderer.Clear();
             if (!Start()) return;
@@ -141,6 +146,16 @@ namespace EsotericRogue {
                                         // Death! Game Over!
                                         return;
                                     }
+                                }
+                                // If any friendlies were met, interact with them.
+                                bool interacted = false;
+                                while (toInteract.Count > 0) {
+                                    toInteract.Dequeue().Interact(PlayerInfo.UnitBrain);
+                                    interacted = true;
+                                }
+                                if (interacted) {
+                                    Renderer.Clear();
+                                    Display();
                                 }
                             }
                             break;

@@ -96,7 +96,7 @@ namespace EsotericRogue {
 
         protected override bool UnitCollision(Unit unit) {
             if (unit is FriendlyUnit friendlyUnit)
-                friendlyUnit.Interact(this);
+                PlayerInput.GameManager.Interact(friendlyUnit);
             else
                 PlayerInput.GameManager.Battle(unit.Brain);
             return true;

@@ -5,7 +5,7 @@ namespace DungeonRogue.Units {
 
         protected override bool UnitCollision(Unit unit) {
             if (unit.Brain is PlayerUnitBrain p)
-                ((FriendlyUnit)Unit).Interact(p);
+                p.PlayerInput.GameManager.Interact((FriendlyUnit)Unit);
             return true;
         }
     }

@@ -11,19 +11,20 @@ namespace EsotericRogue {
         private string WordWrap(string text, ref int widthCount) {
             string[] lines = text.Split(Environment.NewLine);
             StringBuilder stringBuilder = new StringBuilder(text.Length);
-            for (int i = 0, count = lines.Length; i < count; i++) {
+            for (int i = 0, count = lines.Length, oneLessThanCount = count - 1; i < count; i++) {
                 string line = lines[i];
                 string[] words = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 foreach (string word in words) {
                     stringBuilder.Append(word);
-                    stringBuilder.Append(' ');
-                    widthCount += word.Length;
                     if (widthCount > Width) {
                         widthCount = 0;
                         stringBuilder.Append(Environment.NewLine);
+                    } else {
+                        stringBuilder.Append(' ');
                     }
+                    widthCount += word.Length;
                 }
-                if (count > 1) {
+                if (count > 1 && i != oneLessThanCount) {
                     widthCount = 0;
                     stringBuilder.Append(Environment.NewLine);
                 }
