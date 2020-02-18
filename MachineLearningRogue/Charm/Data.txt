@@ -1,0 +1,34 @@
+﻿You ugly	0
+I will kill you	0
+Let's have fun! 1
+I don't want to fight.	1
+You look good	1
+I love the way you smell!	1
+You smell bad	0
+You don't smell bad	1
+You're good	1
+I hate your kind!	0
+I hate haters	1
+I fucking love you!	1
+I fucking hate you!	0
+I don't like you	0
+I dislike you	0
+I like you	1
+I don't hate you	1
+I don't love you.	0
+You are bad	0
+You are good	1
+I wish you were never born.	0
+I like you just the way you are	1
+I hate you	0
+You stink.	0
+You're retarded	0
+Fuck you	0
+You smart	1
+You dumb.	0
+What you looking at?	0
+Love	0
+I love myself	0
+I love	0
+You're a man of dignity	1
+You're lost.	0

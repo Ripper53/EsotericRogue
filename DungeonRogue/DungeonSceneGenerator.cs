@@ -127,9 +127,16 @@ namespace DungeonRogue {
                 case 18:
                     Spawn(SpawnLostGroup);
                     break;
+                case 20:
+                    spawnActions.Add(SpawnDrudge);
+                    break;
+                case 30:
+                    spawnActions.Add(SpawnRedDragon);
+                    break;
                 default:
                     spawnActions.Add(SpawnBandit);
                     spawnActions.Add(SpawnLostGroup);
+                    Spawn(SpawnRedDragon);
                     break;
             }
 
@@ -142,6 +149,11 @@ namespace DungeonRogue {
         private void SpawnOrc(Vector2 position) => Scene.SetUnit(new OrcAIUnitBrain().Unit, position);
         private void SpawnFireTroll(Vector2 position) => Scene.SetUnit(new FireTrollAIUnitBrain().Unit, position);
         private void SpawnYeti(Vector2 position) => Scene.SetUnit(new YetiAIUnitBrain().Unit, position);
+        private void SpawnRedDragon(Vector2 position) => Scene.SetUnit(new RedDragonAIUnitBrain().Unit, position);
+        private void SpawnDrudge(Vector2 position) {
+            Scene.SetUnit(new DrudgeAIUnitBrain().Unit, position);
+            spawnActions.Remove(SpawnDrudge);
+        }
 
         private void SpawnShop(Vector2 position) {
             JadeFriendlyAIUnitBrain unitBrain = new JadeFriendlyAIUnitBrain();
@@ -164,8 +176,7 @@ namespace DungeonRogue {
 
             if (gold > 10) {
                 AddItem(new ChainChestplate(), 20);
-            }
-            if (gold >= 0) {
+            } else if (gold >= 0) {
                 AddItem(new ClothPants(), 10);
             }
         }

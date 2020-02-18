@@ -69,7 +69,7 @@ namespace DungeonRogue {
                     new Sprite("Map Size" + Environment.NewLine)
                 }
             };
-            void setMapSize(Vector2 size) {
+            void SetMapSize(Vector2 size) {
                 Vector2 bufferSize = new Vector2(size.x + 20, size.y);
                 if (bufferSize.x < 120)
                     bufferSize.x = 120;
@@ -82,20 +82,20 @@ namespace DungeonRogue {
                 PlayerInfo.InventoryMenu.Position = new Vector2(size.x + 2, 7);
                 startGame = true;
             }
-            Menu.Option.OptionAction setSizeAction(Vector2 size) {
-                return (menu, op) => setMapSize(size);
+            Menu.Option.OptionAction SetSizeAction(Vector2 size) {
+                return (menu, op) => SetMapSize(size);
             }
-            void createMapSizeOption(Vector2 size) {
+            void CreateMapSizeOption(Vector2 size) {
                 mapSizeMenu.AddOption(new Menu.Option() {
                     Sprites = new Sprite[] {
                         Sprite.CreateUI(size.ToString())
                     },
-                    Action = setSizeAction(size)
+                    Action = SetSizeAction(size)
                 });
             }
-            createMapSizeOption(new Vector2(110, 35));
-            createMapSizeOption(new Vector2(60, 20));
-            createMapSizeOption(new Vector2(35, 35));
+            CreateMapSizeOption(new Vector2(110, 35));
+            CreateMapSizeOption(new Vector2(60, 20));
+            CreateMapSizeOption(new Vector2(35, 35));
             mapSizeMenu.AddOption(new Menu.Option() {
                 Sprites = new Sprite[] {
                     Sprite.CreateUI("Custom")
@@ -121,7 +121,7 @@ namespace DungeonRogue {
                         ySize = minSize;
                     else if (ySize > maxSize)
                         ySize = maxSize;
-                    setMapSize(new Vector2(xSize, ySize));
+                    SetMapSize(new Vector2(xSize, ySize));
                 }
             });
 

@@ -1,0 +1,6 @@
+﻿I will kill you!	1
+I will destroy you	1
+I am not going to fight you	0
+I will run away	0
+You will die	1
+Do not challenge me	1

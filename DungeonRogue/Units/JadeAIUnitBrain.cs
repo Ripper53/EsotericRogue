@@ -36,7 +36,7 @@ namespace DungeonRogue.Units {
         private bool collidedWithPlayer = false;
         public override void PreCalculate(GameManager gameManager) {
             if (collidedWithPlayer) return;
-            CastViewBrain.CastView(this, 0);
+            IView.CastView(this, 0);
             Vector2 playerPos = gameManager.PlayerInfo.Unit.Position;
             if (View.Contains(playerPos)) {
                 IPathfinder.FindAStarPath(this, playerPos);

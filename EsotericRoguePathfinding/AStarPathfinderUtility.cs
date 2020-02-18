@@ -6,8 +6,8 @@ namespace EsotericRogue {
     public static class AStarPathfinderUtility {
         private static readonly AStarPathfinder aStarPathfinder = new AStarPathfinder();
 
-        public static LinkedList<Vector2> FindAStarPath<T>(T ai, Vector2 end) where T : IScene, IPosition {
-            return aStarPathfinder.FindPath(ai.Scene, ai.Position, end);
+        public static void FindAStarPath<T>(T arg, LinkedList<Vector2> path, Vector2 end) where T : IScene, IPosition {
+            aStarPathfinder.FindPath(path, arg.Scene, arg.Position, end);
         }
     }
 }

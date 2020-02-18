@@ -20,7 +20,7 @@ namespace DungeonRogue.Units {
 
             character.Boot.BareItem.Speed = 2;
 
-            character.Inventory.Gold = rng.GetInt(1, 6);
+            character.Inventory.Gold = RandomUtility.GetInt(1, 6);
             Weapon weapon = new SteelSwordWeapon();
             character.Weapon.Equipped = weapon;
             character.Inventory.AddItem(weapon);
@@ -38,7 +38,7 @@ namespace DungeonRogue.Units {
 
         private readonly RandomPositionGetter<BanditAIUnitBrain> randomPositionGetter;
         public override void PreCalculate(GameManager gameManager) {
-            CastViewBrain.CastView(this, 0);
+            IView.CastView(this, 0);
             Vector2 playerPos = gameManager.PlayerInfo.Unit.Position, target;
             if (View.Contains(playerPos)) {
                 target = playerPos;

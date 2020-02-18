@@ -28,21 +28,12 @@ namespace EsotericRogue {
             return Math.Abs(dis.x) + Math.Abs(dis.y);
         }
 
-        public override LinkedList<Vector2> FindPath(Scene scene, Vector2 start, Vector2 end) {
+        public override void FindPath(LinkedList<Vector2> path, Scene scene, Vector2 start, Vector2 end) {
             List<Node>
                 open = new List<Node>() {
                     new Node(start)
                 },
                 closed = new List<Node>();
-
-            static LinkedList<Vector2> GetPath(Node endNode) {
-                LinkedList<Vector2> path = new LinkedList<Vector2>();
-                while (endNode != null) {
-                    path.AddFirst(endNode.Position);
-                    endNode = endNode.Parent;
-                }
-                return path;
-            }
 
             while (open.Count > 0) {
                 // Evaluate open set.
@@ -56,7 +47,11 @@ namespace EsotericRogue {
 
                 if (winner.Position == end) {
                     // DONE!
-                    return GetPath(winner);
+                    while (winner != null) {
+                        path.AddFirst(winner.Position);
+                        winner = winner.Parent;
+                    }
+                    return;
                 }
 
                 closed.Add(winner);
@@ -92,7 +87,6 @@ namespace EsotericRogue {
                 AddNeighbor(new Vector2(-1, 0));
             }
 
-            return null;
         }
 
     }

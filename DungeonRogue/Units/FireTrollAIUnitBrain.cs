@@ -19,7 +19,7 @@ namespace DungeonRogue.Units {
             character.Mana.Add(10);
             character.Mana.Regen = 1;
 
-            character.Inventory.Gold = rng.GetInt(20, 26);
+            character.Inventory.Gold = RandomUtility.GetInt(20, 26);
             Weapon weapon = new FireStaffWeapon();
             character.Weapon.Equipped = weapon;
             character.Inventory.AddItem(weapon);

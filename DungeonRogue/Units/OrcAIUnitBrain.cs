@@ -36,7 +36,7 @@ namespace DungeonRogue.Units {
                 weapon
             };
 
-            dir = (Direction)rng.GetInt(4);
+            dir = (Direction)RandomUtility.GetInt(4);
         }
 
         public override void Controls() {
@@ -51,7 +51,7 @@ namespace DungeonRogue.Units {
         private enum Direction { Up, Right, Down, Left };
         private Direction dir;
         public override void PreCalculate(GameManager gameManager) {
-            CastViewBrain.CastView(this, 0);
+            IView.CastView(this, 0);
 
             Vector2 playerPos = gameManager.PlayerInfo.Unit.Position;
             if (View.Contains(playerPos)) {

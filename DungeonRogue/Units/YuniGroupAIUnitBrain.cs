@@ -46,7 +46,7 @@ namespace DungeonRogue.Units {
         }
 
         public override void PreCalculate(GameManager gameManager) {
-            CastViewBrain.CastView(this, 0);
+            IView.CastView(this, 0);
             YuniGroup.UpdateTarget();
             IPathfinder.FindAStarPath(this, YuniGroup.Target + YuniGroup.GetPosition(GroupIndex));
         }

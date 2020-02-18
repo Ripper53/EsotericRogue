@@ -4,12 +4,7 @@ namespace EsotericRogue {
     public class CastViewBrain : ViewBrain {
 
         #region Static
-        public static void CastView<T>(T ai, int obstacleCount) where T : AIUnitBrain, AIUnitBrain.IView {
-            ai.View = new HashSet<Vector2>();
-            CastView(ai.View, ai.Scene, ai.Unit.Position, obstacleCount);
-        }
-
-        private static void CastView(HashSet<Vector2> positions, Scene scene, Vector2 origin, int obstacleCount) {
+        public static void CastView(HashSet<Vector2> positions, Scene scene, Vector2 origin, int obstacleCount) {
             // Remember positive is down!
 
             bool CanSee(Vector2 position) => scene.GetTile(position) != Scene.Tile.Wall;
