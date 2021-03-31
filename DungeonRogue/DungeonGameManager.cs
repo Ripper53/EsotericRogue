@@ -48,7 +48,7 @@ namespace DungeonRogue {
             });
             menu.AddOption(new Menu.Option() {
                 Sprites = new Sprite[] {
-                    Sprite.CreateUI("Quit")
+                    Sprite.CreateUI("Quit", ConsoleColor.Red)
                 },
                 Action = (menu, op) => QuitGame = true
             });
@@ -136,7 +136,7 @@ namespace DungeonRogue {
             Renderer.Clear();
             Renderer.Display(new Sprite("Enter Name: "), new Vector2(0, 0));
             string name = Renderer.ReadLine();
-            if (name == "")
+            if (string.IsNullOrWhiteSpace(name))
                 name = "You";
             PlayerInfo.Character.Name = name;
 

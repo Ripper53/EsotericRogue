@@ -12,8 +12,8 @@ namespace EsotericRogue {
             Background = background;
         }
 
-        public static Sprite CreateUI(string text) {
-            return new Sprite(text, ConsoleColor.White, ConsoleColor.Black);
+        public static Sprite CreateUI(string text, ConsoleColor foregroundColor = ConsoleColor.White) {
+            return new Sprite(text, foregroundColor, ConsoleColor.Black);
         }
 
         public static Sprite CreateEmptyUI(int count) {
